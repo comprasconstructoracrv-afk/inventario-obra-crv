@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="header-actions no-print">
+    <button onclick="window.history.back()" class="btn-dark-custom">
+        Volver
+    </button>
+</div>
+
+<div class="page-title-card">
+
+    <div class="title-icon">
+        📥
+    </div>
+
+    <div>
+        <h1>Ingreso de Producto</h1>
+        <p>Registro de nueva cantidad para producto existente.</p>
+    </div>
+
+</div>
+
+<div class="ingreso-grid">
+
+    <!-- PANEL IZQUIERDO -->
+    <div class="producto-info-card">
+
+        <h3>Información del producto</h3>
+
+        <div class="producto-item">
+            <span>Código</span>
+            <strong>{{ producto.codigo }}</strong>
+        </div>
+
+        <div class="producto-item">
+            <span>Producto</span>
+            <strong>{{ producto.nombre }}</strong>
+        </div>
+
+        <div class="producto-item">
+            <span>Unidad</span>
+            <strong>{{ producto.unidad }}</strong>
+        </div>
+
+        <div class="stock-total-card">
+
+            <small>Stock actual total</small>
+
+            <h2>
+                {{ "{:,.2f}".format(producto.stock).replace(",", "X").replace(".", ",").replace("X", ".") }}
+            </h2>
+
+            <span>{{ producto.unidad }}</span>
+
+        </div>
+
+    </div>
+
+    <!-- PANEL DERECHO -->
+    <div class="formulario-card">
+
+        <h3>Datos del ingreso</h3>
+
+        <form method="POST">
+
+            <div class="form-grid">
+
+                <div>
+                    <label>Fecha de ingreso</label>
+
+                    <input
+                        type="date"
+                        name="fecha_ingreso"
+                        value="{{ fecha_actual }}"
+                        required
+                    >
+                </div>
+
+                <div>
+                    <label>Bodega a la que ingresa</label>
+
+                    <select name="obra_id" required>
+
+                        <option value="">
+                            Seleccione una bodega
+                        </option>
+
+                        {% for bodega in bodegas %}
+                        <option value="{{ bodega.id }}">
+                            {{ bodega.nombre }}
+                        </option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+            </div>
+
+            <label>Cantidad nueva que ingresa</label>
+
+            <input
+                type="number"
+                step="0.01"
+                name="cantidad"
+                placeholder="Ingrese la cantidad"
+                required
+            >
+
+            <label>Responsable del ingreso</label>
+
+            <input
+                type="text"
+                name="responsable"
+                placeholder="Nombre completo del responsable"
+                required
+            >
+
+            <label>Observaciones (opcional)</label>
+
+            <input
+                type="text"
+                name="observaciones"
+                placeholder="Factura, proveedor, remisión, comentario..."
+            >
+
+            <div class="alerta-info">
+
+                ⚠️ La cantidad ingresada se sumará automáticamente
+                al inventario de la bodega seleccionada.
+
+            </div>
+
+            <div class="acciones-formulario">
+
+                <button type="submit" class="btn-success-custom">
+                    Guardar ingreso y generar recibo
+                </button>
+
+                <a href="/productos" class="btn-cancelar">
+                    Cancelar
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

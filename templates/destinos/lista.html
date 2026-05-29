@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="header-actions no-print">
+
+    <div class="left-actions">
+        <button onclick="window.history.back()" class="btn btn-dark">
+            Volver
+        </button>
+    </div>
+
+    <div class="right-actions">
+        <a class="btn btn-success" href="/destinos/nuevo">
+            + Nuevo Destino
+        </a>
+    </div>
+
+</div>
+
+<div class="page-header-card">
+    <h1>Destinos de Salida</h1>
+    <p>
+        Casas, zonas, urbanismo y lugares donde
+        se despacha material.
+    </p>
+</div>
+
+<div class="table-card">
+
+    <table>
+
+        <tr>
+            <th>ID</th>
+            <th>Destino</th>
+            <th>Sector</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+
+        {% for d in destinos %}
+        <tr>
+
+            <td>{{ d.id }}</td>
+
+            <td>
+                <strong>{{ d.nombre }}</strong>
+            </td>
+
+            <td>{{ d.sector }}</td>
+
+            <td>
+                {% if d.estado == "ACTIVO" %}
+                    <span class="badge-success">
+                        ACTIVO
+                    </span>
+                {% else %}
+                    <span class="badge-danger">
+                        INACTIVO
+                    </span>
+                {% endif %}
+            </td>
+
+            <td class="text-center">
+
+                <a class="btn btn-small btn-edit"
+                   href="/destinos/editar/{{ d.id }}">
+
+                    Editar
+
+                </a>
+
+                <a class="btn btn-small btn-danger"
+                   href="/destinos/eliminar/{{ d.id }}"
+                   onclick="return confirm('¿Desactivar destino?')">
+
+                    Eliminar
+
+                </a>
+
+            </td>
+
+        </tr>
+        {% endfor %}
+
+    </table>
+
+</div>
+
+{% endblock %}

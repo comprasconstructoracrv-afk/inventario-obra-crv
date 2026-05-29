@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Editar Producto</h1>
+
+<div class="card">
+    <form method="POST">
+        <label>Código</label>
+        <input type="text" name="codigo" value="{{ producto.codigo }}" required>
+
+        <label>Nombre</label>
+        <input type="text" name="nombre" value="{{ producto.nombre }}" required>
+
+        <label>Categoría</label>
+        <input type="text" name="categoria" value="{{ producto.categoria }}">
+
+        <label>Unidad / Referencia</label>
+        <select name="unidad" id="unidad" onchange="mostrarOtraUnidad()" required>
+            <option value="{{ producto.unidad }}">{{ producto.unidad }}</option>
+            <option value="M2">M2</option>
+            <option value="UNIDADES">UNIDADES</option>
+            <option value="GALON">GALON</option>
+            <option value="CAJAS">CAJAS</option>
+            <option value="KILOGRAMO">KILOGRAMO</option>
+            <option value="PULGADAS">PULGADAS</option>
+            <option value="METRO LINEAL">METRO LINEAL</option>
+            <option value="PESO">PESO</option>
+            <option value="GRAMO">GRAMO</option>
+            <option value="OTRO">OTRO</option>
+        </select>
+
+        <div id="otraUnidadBox" style="display:none;">
+            <label>Escriba otra unidad / referencia</label>
+            <input type="text" name="otra_unidad" id="otra_unidad">
+        </div>
+
+        <label>Stock mínimo</label>
+        <input type="number" name="stock_minimo" step="0.01" value="{{ producto.stock_minimo }}">
+
+        <label>Precio unitario</label>
+        <input type="number" name="precio" step="0.01" value="{{ producto.precio }}">
+
+        <br><br>
+        <button type="submit">Guardar cambios</button>
+    </form>
+</div>
+
+<script>
+function mostrarOtraUnidad() {
+    const unidad = document.getElementById("unidad").value;
+    const otraBox = document.getElementById("otraUnidadBox");
+    const otraInput = document.getElementById("otra_unidad");
+
+    if (unidad === "OTRO") {
+        otraBox.style.display = "block";
+        otraInput.required = true;
+    } else {
+        otraBox.style.display = "none";
+        otraInput.required = false;
+        otraInput.value = "";
+    }
+}
+</script>
+{% endblock %}

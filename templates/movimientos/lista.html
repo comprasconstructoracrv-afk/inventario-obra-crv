@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+.movimientos-toolbar{
+    background:white;
+    border-radius:18px;
+    padding:18px;
+    margin-bottom:18px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:16px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.08);
+}
+
+.movimientos-search{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    width:520px;
+}
+
+.movimientos-search input{
+    flex:1;
+    height:42px;
+    margin:0;
+}
+
+.movimientos-search button{
+    height:42px;
+}
+
+.movimientos-table-card{
+    background:white;
+    border-radius:18px;
+    padding:18px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.08);
+}
+
+.movimientos-table td,
+.movimientos-table th{
+    text-align:center;
+    vertical-align:middle;
+}
+
+@media(max-width:900px){
+    .movimientos-toolbar{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .movimientos-search{
+        width:100%;
+    }
+}
+</style>
+
+<div class="page-header-card">
+    <h1>Salidas de Material</h1>
+    <p>Registro de materiales despachados a casas, zonas y puntos de obra.</p>
+</div>
+
+<div class="movimientos-toolbar no-print">
+
+    <a class="btn btn-success" href="/movimientos/nuevo">
+        + Nueva Salida
+    </a>
+
+    <form method="GET" class="movimientos-search">
+        <input
+            type="text"
+            name="buscar"
+            placeholder="Buscar por producto, bodega, destino u observación"
+            value="{{ request.args.get('buscar', '') }}"
+        >
+
+        <button type="submit" class="btn btn-dark">
+            Buscar
+        </button>
+    </form>
+
+</div>
+
+<div class="movimientos-table-card">
+
+    <table class="movimientos-table">
+        <tr>
+            <th>Fecha</th>
+            <th>Producto</th>
+            <th>Bodega</th>
+            <th>Cantidad</th>
+            <th>Destino</th>
+            <th>Observaciones</th>
+            <th>Acciones</th>
+        </tr>
+
+        {% for m in movimientos %}
+        <tr>
+            <td>{{ m.fecha }}</td>
+
+            <td>{{ m.producto.nombre if m.producto else "SIN PRODUCTO" }}</td>
+
+            <td>{{ m.obra.nombre if m.obra else "SIN BODEGA" }}</td>
+
+            <td>
+                {{ "{:,.2f}".format(m.cantidad).replace(",", "X").replace(".", ",").replace("X", ".") }}
+            </td>
+
+            <td>
+                {% if m.destino %}
+                    {{ m.destino.nombre }}
+                {% else %}
+                    SIN DESTINO
+                {% endif %}
+            </td>
+
+            <td>{{ m.observaciones }}</td>
+
+            <td>
+                <a class="btn btn-small btn-edit" href="/movimientos/editar/{{ m.id }}">
+                    Editar
+                </a>
+
+                <a class="btn btn-small btn-danger"
+                   href="/movimientos/eliminar/{{ m.id }}"
+                   onclick="return confirm('¿Eliminar esta salida? Esto devolverá el stock a la bodega.')">
+                    Eliminar
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+.productos-toolbar{
+    background:white;
+    border-radius:18px;
+    padding:18px;
+    margin-bottom:18px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:16px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.08);
+}
+
+.productos-search{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    width:520px;
+}
+
+.productos-search input{
+    flex:1;
+    height:42px;
+    margin:0;
+}
+
+.productos-search button{
+    height:42px;
+}
+
+.productos-table-card{
+    background:white;
+    border-radius:18px;
+    padding:18px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.08);
+}
+
+.productos-table td,
+.productos-table th{
+    text-align:center;
+    vertical-align:middle;
+}
+
+@media(max-width:900px){
+    .productos-toolbar{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .productos-search{
+        width:100%;
+    }
+}
+</style>
+
+<div class="page-header-card">
+    <h1>Productos</h1>
+    <p>Catálogo general de materiales del inventario.</p>
+</div>
+
+<div class="productos-toolbar no-print">
+
+    <a class="btn btn-success" href="/productos/nuevo">
+        + Nuevo Producto
+    </a>
+
+    <form method="GET" class="productos-search">
+        <input
+            type="text"
+            name="buscar"
+            placeholder="Buscar por código o nombre"
+            value="{{ request.args.get('buscar', '') }}"
+        >
+
+        <button type="submit" class="btn btn-dark">
+            Buscar
+        </button>
+    </form>
+
+</div>
+
+<div class="productos-table-card">
+
+    <table class="productos-table">
+        <tr>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Unidad</th>
+            <th>Stock</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+
+        {% for p in productos %}
+        <tr>
+            <td>{{ p.codigo }}</td>
+
+            <td>{{ p.nombre }}</td>
+
+            <td>{{ p.unidad }}</td>
+
+            <td>
+                {{ "{:,.2f}".format(p.stock).replace(",", "X").replace(".", ",").replace("X", ".") }}
+            </td>
+
+            <td>
+                {% if p.stock <= 0 %}
+                    <span class="badge-danger">Agotado</span>
+                {% else %}
+                    <span class="badge-success">Disponible</span>
+                {% endif %}
+            </td>
+
+            <td>
+                <a class="btn btn-small btn-success" href="/productos/ingresar/{{ p.id }}">
+                    Ingresar
+                </a>
+
+                <a class="btn btn-small" href="/productos/editar/{{ p.id }}">
+                    Editar
+                </a>
+
+                <a class="btn btn-small btn-danger"
+                   href="/productos/eliminar/{{ p.id }}"
+                   onclick="return confirm('¿Eliminar este producto?')">
+                    Eliminar
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</div>
+
+{% endblock %}

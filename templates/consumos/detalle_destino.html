@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="header-actions no-print">
+    <div class="left-actions">
+        <button onclick="window.history.back()" class="btn btn-dark">
+            Volver
+        </button>
+    </div>
+
+    <div class="right-actions">
+        <a class="btn btn-pdf" href="/consumos/destino/{{ destino.id }}/pdf">
+            PDF
+        </a>
+
+        <button onclick="window.print()" class="btn btn-print">
+            Imprimir
+        </button>
+    </div>
+</div>
+
+<div class="page-header-card">
+    <h1>Reporte - {{ destino.nombre }}</h1>
+    <p>Historial completo de materiales enviados a este destino.</p>
+</div>
+
+<div class="table-card">
+
+    <table>
+        <tr>
+            <th>Fecha</th>
+            <th>Producto</th>
+            <th>Código</th>
+            <th>Bodega</th>
+            <th>Cantidad</th>
+            <th>Unidad</th>
+            <th>Observaciones</th>
+        </tr>
+
+        {% for m in movimientos %}
+        <tr>
+            <td>{{ m.fecha.strftime("%d/%m/%Y") }}</td>
+            <td>{{ m.producto.nombre }}</td>
+            <td>{{ m.producto.codigo }}</td>
+            <td>{{ m.obra.nombre }}</td>
+            <td>
+                {{ "{:,.2f}".format(m.cantidad).replace(",", "X").replace(".", ",").replace("X", ".") }}
+            </td>
+            <td>{{ m.producto.unidad }}</td>
+            <td>{{ m.observaciones or "" }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</div>
+
+{% endblock %}

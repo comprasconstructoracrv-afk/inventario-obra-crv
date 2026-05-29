@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+.inicio-card{
+    background:white;
+    border-radius:24px;
+    padding:55px;
+    box-shadow:0 6px 22px rgba(0,0,0,0.08);
+    text-align:center;
+}
+
+.inicio-logo{
+    width:150px;
+    margin-bottom:20px;
+}
+
+.inicio-card h1{
+    font-size:42px;
+    color:#0f172a;
+    margin-bottom:12px;
+}
+
+.inicio-card p{
+    font-size:18px;
+    color:#64748b;
+    margin-bottom:35px;
+}
+
+.inicio-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:22px;
+    margin-top:35px;
+}
+
+.inicio-opcion{
+    background:#f8fafc;
+    border-radius:18px;
+    padding:28px;
+    text-decoration:none;
+    color:#0f172a;
+    border:1px solid #e2e8f0;
+    transition:0.2s;
+}
+
+.inicio-opcion:hover{
+    transform:translateY(-4px);
+    box-shadow:0 8px 20px rgba(0,0,0,0.10);
+}
+
+.inicio-opcion .icono{
+    font-size:36px;
+    margin-bottom:12px;
+}
+
+.inicio-opcion h3{
+    margin:0;
+    font-size:20px;
+}
+
+.inicio-opcion span{
+    display:block;
+    margin-top:8px;
+    color:#64748b;
+    font-size:14px;
+}
+
+@media(max-width:900px){
+    .inicio-grid{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+
+<div class="inicio-card">
+
+    <img src="{{ url_for('static', filename='logo.png') }}" class="inicio-logo">
+
+    <h1>Bienvenido al Inventario de Obra CRV</h1>
+
+    <p>
+        Sistema profesional para controlar bodegas, productos,
+        entradas, salidas, traslados e historial de materiales.
+    </p>
+
+    <div class="inicio-grid">
+
+        <a href="/existencias" class="inicio-opcion">
+            <div class="icono">📦</div>
+            <h3>Ver Inventario</h3>
+            <span>Consultar materiales por bodega</span>
+        </a>
+
+        <a href="/productos" class="inicio-opcion">
+            <div class="icono">🧱</div>
+            <h3>Productos</h3>
+            <span>Administrar materiales registrados</span>
+        </a>
+
+        <a href="/movimientos" class="inicio-opcion">
+            <div class="icono">📤</div>
+            <h3>Salidas de Material</h3>
+            <span>Registrar despachos hacia obra</span>
+        </a>
+
+        <a href="/obras" class="inicio-opcion">
+            <div class="icono">🏗️</div>
+            <h3>Bodegas</h3>
+            <span>Gestionar puntos de almacenamiento</span>
+        </a>
+
+        <a href="/historial-producto" class="inicio-opcion">
+            <div class="icono">📚</div>
+            <h3>Historial Producto</h3>
+            <span>Consultar movimientos por material</span>
+        </a>
+
+        <a href="/consumos/destino" class="inicio-opcion">
+            <div class="icono">🏠</div>
+            <h3>Consumo por Destino</h3>
+            <span>Revisar consumo por casa o zona</span>
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

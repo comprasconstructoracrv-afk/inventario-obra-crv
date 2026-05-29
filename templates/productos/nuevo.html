@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+.producto-page-title{
+    background:white;
+    border-radius:22px;
+    padding:34px;
+    margin-bottom:28px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:20px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.08);
+}
+
+.producto-page-title .icono{
+    width:78px;
+    height:78px;
+    border-radius:50%;
+    background:#dbeafe;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:36px;
+}
+
+.producto-page-title h1{
+    margin:0;
+    font-size:36px;
+    color:#0f172a;
+}
+
+.producto-page-title p{
+    margin-top:8px;
+    color:#64748b;
+    font-size:16px;
+}
+
+.producto-grid{
+    display:grid;
+    grid-template-columns:320px 1fr;
+    gap:28px;
+}
+
+.producto-info-card,
+.formulario-card{
+    background:white;
+    border-radius:22px;
+    padding:30px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.08);
+}
+
+.producto-info-card h3,
+.formulario-card h3{
+    color:#2563eb;
+    margin-top:0;
+    margin-bottom:24px;
+    font-size:22px;
+}
+
+.mini-card{
+    background:#f8fafc;
+    border:1px solid #dbeafe;
+    border-radius:18px;
+    padding:22px;
+    margin-bottom:18px;
+}
+
+.mini-card span{
+    display:block;
+    color:#64748b;
+    font-size:14px;
+    margin-bottom:8px;
+}
+
+.mini-card strong{
+    font-size:26px;
+    color:#0f172a;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:26px;
+}
+
+.form-group{
+    margin-bottom:22px;
+}
+
+.form-group label{
+    display:block;
+    margin-bottom:9px;
+    font-weight:700;
+    color:#0f172a;
+}
+
+.formulario-card input,
+.formulario-card select{
+    width:100%;
+    box-sizing:border-box;
+    padding:15px 16px;
+    border-radius:14px;
+    border:1px solid #cbd5e1;
+    background:#f8fafc;
+    font-size:15px;
+}
+
+.formulario-card input:focus,
+.formulario-card select:focus{
+    outline:none;
+    border-color:#2563eb;
+    background:white;
+    box-shadow:0 0 0 4px rgba(37,99,235,0.12);
+}
+
+.alerta-info{
+    background:#fff7ed;
+    border:1px solid #fdba74;
+    color:#c2410c;
+    padding:18px;
+    border-radius:16px;
+    font-weight:700;
+    margin-top:10px;
+}
+
+.acciones-formulario{
+    display:flex;
+    gap:15px;
+    margin-top:25px;
+}
+
+.btn-guardar{
+    background:#16a34a;
+    color:white;
+    border:none;
+    padding:16px 28px;
+    border-radius:14px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.btn-cancelar{
+    background:#0f172a;
+    color:white;
+    padding:16px 28px;
+    border-radius:14px;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+@media(max-width:1000px){
+    .producto-grid,
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+}
+
+.modal-error{
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,0.45);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+}
+
+.modal-error-card{
+    width:420px;
+    background:white;
+    border-radius:22px;
+    padding:32px;
+    text-align:center;
+    box-shadow:0 20px 50px rgba(0,0,0,0.25);
+}
+
+.modal-icon{
+    width:70px;
+    height:70px;
+    border-radius:50%;
+    background:#fee2e2;
+    color:#dc2626;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:34px;
+    margin:0 auto 18px;
+}
+
+.modal-error-card h2{
+    margin:0;
+    color:#0f172a;
+    font-size:26px;
+}
+
+.modal-error-card p{
+    margin:15px 0 25px;
+    color:#475569;
+    font-size:16px;
+    line-height:1.5;
+}
+
+.modal-actions{
+    display:flex;
+    gap:12px;
+    justify-content:center;
+}
+
+.btn-modal-primary{
+    background:#16a34a;
+    color:white;
+    padding:12px 18px;
+    border-radius:12px;
+    text-decoration:none;
+    font-weight:700;
+}
+
+.btn-modal-secondary{
+    background:#0f172a;
+    color:white;
+    border:none;
+    padding:12px 18px;
+    border-radius:12px;
+    font-weight:700;
+    cursor:pointer;
+}
+</style>
+
+<div class="header-actions no-print">
+    <div class="left-actions">
+        <button onclick="window.history.back()" class="btn btn-dark">Volver</button>
+    </div>
+</div>
+
+<div class="producto-page-title">
+    <div class="icono">📦</div>
+    <div>
+        <h1>Nuevo Producto</h1>
+            {% if error_producto %}
+            <div class="modal-error">
+                <div class="modal-error-card">
+                    <div class="modal-icon">⚠️</div>
+
+                    <h2>Producto ya existe</h2>
+
+                    <p>{{ error_producto }}</p>
+
+                    <div class="modal-actions">
+                        <a href="/productos" class="btn-modal-primary">
+                            Ir a productos
+                        </a>
+
+                        <button onclick="document.querySelector('.modal-error').style.display='none'"
+                                class="btn-modal-secondary">
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        <p>Registro de materiales y productos del inventario.</p>
+    </div>
+</div>
+
+<form method="POST">
+
+
+        <div class="formulario-card">
+            <h3>Datos del producto</h3>
+
+            <input type="hidden" name="codigo" value="{{ codigo }}">
+
+            <div class="form-group">
+                <label>Nombre del producto</label>
+                <input type="text" name="nombre" required>
+            </div>
+
+            <div class="form-group">
+                <label>Categoría</label>
+                <input type="text" name="categoria" placeholder="Ej: OBRA, FERRETERÍA, ACABADOS">
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Unidad / Referencia</label>
+                    <select name="unidad" required>
+                        <option value="">Seleccione una unidad</option>
+                        <option value="M2">M2</option>
+                        <option value="UNIDADES">UNIDADES</option>
+                        <option value="GALON">GALON</option>
+                        <option value="CAJAS">CAJAS</option>
+                        <option value="KILOGRAMO">KILOGRAMO</option>
+                        <option value="PULGADAS">PULGADAS</option>
+                        <option value="METRO LINEAL">METRO LINEAL</option>
+                        <option value="PESO">PESO</option>
+                        <option value="GRAMO">GRAMO</option>
+                        <option value="LIBRA">LIBRA</option>
+                        <option value="OTRO">OTRO</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Bodega</label>
+                    <select name="obra_id" required>
+                        <option value="">Seleccione una bodega</option>
+                        {% for bodega in bodegas %}
+                            <option value="{{ bodega.id }}">{{ bodega.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Cantidad</label>
+                    <input type="number" step="0.01" name="cantidad" required>
+                </div>
+            </div>
+
+            <div class="alerta-info">
+                📦 El producto quedará registrado automáticamente en la bodega seleccionada.
+            </div>
+
+            <div class="acciones-formulario">
+                <button type="submit" class="btn-guardar">💾 Guardar Producto</button>
+                <a href="/productos" class="btn-cancelar">Cancelar</a>
+            </div>
+        </div>
+
+    </div>
+
+</form>
+
+{% endblock %}

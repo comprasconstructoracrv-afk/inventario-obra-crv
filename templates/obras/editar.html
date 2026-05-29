@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="titulo-pagina-card">
+
+    <div class="titulo-icono">
+        🏢
+    </div>
+
+    <div>
+        <h1>Editar Bodega</h1>
+        <p>
+            Modifique la información de la bodega seleccionada.
+        </p>
+    </div>
+
+</div>
+<div class="formulario-card">
+
+    <h2 class="titulo-seccion">
+        Datos de la bodega
+    </h2>
+
+    <form method="POST">
+
+                <label>Nombre</label>
+                <input type="text" name="nombre" value="{{ obra.nombre }}" required>
+
+                <label>Ubicación</label>
+                <input type="text" name="ubicacion" value="{{ obra.ubicacion }}">
+
+                <label>Responsable</label>
+                <input type="text" name="responsable" value="{{ obra.responsable }}">
+
+                <label>Estado</label>
+                <select name="estado">
+                    <option value="ACTIVA" {% if obra.estado == "ACTIVA" %}selected{% endif %}>ACTIVA</option>
+                    <option value="PAUSADA" {% if obra.estado == "PAUSADA" %}selected{% endif %}>PAUSADA</option>
+                    <option value="FINALIZADA" {% if obra.estado == "FINALIZADA" %}selected{% endif %}>FINALIZADA</option>
+                </select>
+
+                <br><br>
+                <button type="submit" class="btn-guardar">
+                    Guardar cambios
+                </button>
+    </form>
+
+</div>
+<style>
+
+.titulo-pagina-card{
+    background:#fff;
+    border-radius:20px;
+    padding:35px;
+    margin-bottom:30px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:20px;
+
+    box-shadow:0 3px 10px rgba(0,0,0,.08);
+}
+
+.titulo-icono{
+    width:80px;
+    height:80px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:50%;
+    background:#e8f0ff;
+
+    font-size:38px;
+}
+
+.titulo-pagina-card h1{
+    margin:0;
+    color:#0f172a;
+}
+
+.titulo-pagina-card p{
+    margin-top:8px;
+    color:#64748b;
+}
+
+.formulario-card{
+    background:#fff;
+    border-radius:20px;
+    padding:35px;
+
+    box-shadow:0 3px 10px rgba(0,0,0,.08);
+}
+
+.titulo-seccion{
+    color:#2563eb;
+    margin-bottom:25px;
+}
+
+.btn-guardar{
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:12px 25px;
+    border-radius:10px;
+    font-weight:600;
+}
+
+.btn-guardar:hover{
+    background:#1d4ed8;
+}
+
+</style>
+{% endblock %}

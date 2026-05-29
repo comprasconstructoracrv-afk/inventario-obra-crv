@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="header-actions no-print">
+    <div class="left-actions"></div>
+
+    <div class="right-actions">
+        <a class="btn btn-excel" href="/existencias/excel">Excel</a>
+        <a class="btn btn-pdf" href="/existencias/pdf">PDF</a>
+        <button onclick="window.print()" class="btn btn-print">Imprimir</button>
+    </div>
+</div>
+
+<div class="page-header-card no-print">
+    <h1>Ver Inventario</h1>
+    <p>Seleccione una bodega para consultar su inventario.</p>
+</div>
+
+<div class="bodega-grid no-print">
+
+    {% for item in bodegas_data %}
+    <div class="bodega-card">
+
+        <div class="bodega-header">
+            <div>
+                <h2>{{ item.bodega.nombre }}</h2>
+                <p>{{ item.bodega.ubicacion }}</p>
+            </div>
+
+            <span class="badge-success">{{ item.bodega.estado }}</span>
+        </div>
+
+        <div class="bodega-kpis">
+            <div>
+                <strong>{{ item.total_productos }}</strong>
+                <span>Productos</span>
+            </div>
+
+            <div>
+                <strong>
+                    {{ "{:,.2f}".format(item.total_cantidad).replace(",", "X").replace(".", ",").replace("X", ".") }}
+                </strong>
+                <span>Cantidad total</span>
+            </div>
+        </div>
+
+        <div class="bodega-actions no-print">
+            <a class="btn btn-new" href="/existencias/bodega/{{ item.bodega.id }}">Ver inventario</a>
+        </div>
+
+    </div>
+    {% endfor %}
+
+</div>
+
+<div class="print-only">
+    <h2>REPORTE GENERAL DE INVENTARIO</h2>
+
+    <table>
+        <tr>
+            <th>Bodega</th>
+            <th>Productos</th>
+            <th>Cantidad total</th>
+            <th>Estado</th>
+        </tr>
+
+        {% for item in bodegas_data %}
+        <tr>
+            <td>{{ item.bodega.nombre }}</td>
+            <td>{{ item.total_productos }}</td>
+            <td>
+                {{ "{:,.2f}".format(item.total_cantidad).replace(",", "X").replace(".", ",").replace("X", ".") }}
+            </td>
+            <td>{{ item.bodega.estado }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+{% endblock %}

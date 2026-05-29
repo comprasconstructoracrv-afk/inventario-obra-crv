@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    .page-card{
+        background:white;
+        border-radius:18px;
+        padding:26px;
+        margin-bottom:22px;
+        box-shadow:0 4px 14px rgba(0,0,0,0.08);
+    }
+
+    .titulo-seccion{
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        gap:16px;
+    }
+
+    .titulo-icono{
+        width:58px;
+        height:58px;
+        border-radius:50%;
+        background:#dbeafe;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:28px;
+    }
+
+    .titulo-seccion h1{
+        font-size:30px;
+        color:#0f172a;
+        margin:0;
+    }
+
+    .titulo-seccion p{
+        color:#64748b;
+        margin-top:6px;
+        font-size:14px;
+    }
+
+    .producto-grid{
+        display:grid;
+        grid-template-columns:240px 1fr;
+        gap:22px;
+        align-items:start;
+    }
+
+    .producto-info-card,
+    .formulario-card{
+        background:white;
+        border-radius:18px;
+        padding:24px;
+        box-shadow:0 4px 14px rgba(0,0,0,0.08);
+    }
+
+    .producto-info-card h3,
+    .formulario-card h3{
+        color:#2563eb;
+        font-size:22px;
+        margin:0 0 20px 0;
+    }
+
+    .mini-card{
+        background:#f8fafc;
+        border:1px solid #dbeafe;
+        border-radius:16px;
+        padding:16px;
+        margin-bottom:16px;
+    }
+
+    .mini-card span{
+        display:block;
+        color:#64748b;
+        font-size:14px;
+        margin-bottom:6px;
+    }
+
+    .mini-card strong{
+        font-size:22px;
+        color:#0f172a;
+    }
+
+    .form-group{
+        margin-bottom:16px;
+    }
+
+    .form-group label{
+        display:block;
+        margin-bottom:7px;
+        font-weight:700;
+        color:#0f172a;
+        font-size:14px;
+    }
+
+    .form-group input,
+    .form-group select{
+        width:100%;
+        box-sizing:border-box;
+        height:44px;
+        border-radius:12px;
+        border:1px solid #cbd5e1;
+        padding:0 14px;
+        font-size:14px;
+        background:#f8fafc;
+    }
+
+    .alerta-info{
+        margin-top:16px;
+        background:#fff7ed;
+        border:1px solid #fdba74;
+        color:#c2410c;
+        padding:14px;
+        border-radius:14px;
+        font-size:14px;
+        font-weight:600;
+    }
+
+    .acciones-formulario{
+        margin-top:20px;
+        display:flex;
+        gap:12px;
+    }
+
+    .btn-guardar,
+    .btn-cancelar{
+        border:none;
+        padding:12px 18px;
+        border-radius:12px;
+        text-decoration:none;
+        font-size:14px;
+        font-weight:700;
+        cursor:pointer;
+    }
+
+    .btn-guardar{
+        background:#16a34a;
+        color:white;
+    }
+
+    .btn-cancelar{
+        background:#0f172a;
+        color:white;
+    }
+
+    .header-actions{
+        margin-bottom:18px;
+    }
+
+</style>
+
+<div class="page-card">
+
+    <div class="titulo-seccion">
+
+        <div class="titulo-icono">
+            🏢
+        </div>
+
+        <div>
+            <h1>Nueva Bodega</h1>
+            <p>
+                Registro de bodegas físicas,
+                ferretería o puntos de almacenamiento.
+            </p>
+        </div>
+
+    </div>
+
+</div>
+
+<form method="POST">
+
+    <div class="producto-grid">
+
+        <!-- PANEL IZQUIERDO -->
+        <div class="producto-info-card">
+
+            <h3>Información</h3>
+
+            <div class="mini-card">
+                <span>Tipo</span>
+                <strong>BODEGA</strong>
+            </div>
+
+            <div class="mini-card">
+                <span>Estado</span>
+                <strong>ACTIVA</strong>
+            </div>
+
+        </div>
+
+        <!-- PANEL DERECHO -->
+        <div class="formulario-card">
+
+            <h3>Datos de la bodega</h3>
+
+            <div class="form-group">
+                <label>Nombre de bodega</label>
+
+                <input type="text"
+                       name="nombre"
+                       placeholder="Ej: BODEGA 1, FERRETERÍA"
+                       required>
+            </div>
+
+            <div class="form-group">
+                <label>Número de bodega</label>
+
+                <input type="text"
+                       name="numero_bodega"
+                       placeholder="Ej: 1, 2, 3, FERRETERÍA">
+            </div>
+
+            <div class="form-group">
+                <label>Ubicación</label>
+
+                <input type="text"
+                       name="ubicacion"
+                       placeholder="Ej: EDEN LUXURY, ZONA SOCIAL">
+            </div>
+
+            <div class="form-group">
+                <label>Responsable de la bodega</label>
+
+                <input type="text"
+                       name="responsable"
+                       placeholder="Nombre del responsable">
+            </div>
+
+            <div class="form-group">
+                <label>Estado de la bodega</label>
+
+                <select name="estado">
+
+                    <option value="ACTIVA">
+                        ACTIVA
+                    </option>
+
+                    <option value="INACTIVA">
+                        INACTIVA
+                    </option>
+
+                </select>
+            </div>
+
+            <div class="alerta-info">
+                🏢 La bodega quedará disponible
+                inmediatamente en el sistema.
+            </div>
+
+            <div class="acciones-formulario">
+
+                <button type="submit" class="btn-guardar">
+                    💾 Guardar Bodega
+                </button>
+
+                <a href="{{ url_for('obras.listar_obras') }}" class="btn-cancelar">
+                    Cancelar
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</form>
+{% endblock %}

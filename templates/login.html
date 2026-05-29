@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - OBRASTOCK</title>
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+            font-family: Arial, Helvetica, sans-serif;
+            background: linear-gradient(135deg,#0f172a,#111827);
+            height:100vh;
+
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
+
+        .login-container{
+            width:420px;
+            background:white;
+            border-radius:20px;
+            padding:40px;
+            box-shadow:0 10px 35px rgba(0,0,0,0.25);
+        }
+
+        .logo-area{
+            text-align:center;
+            margin-bottom:25px;
+        }
+
+        .logo-area img{
+            width:90px;
+            margin-bottom:15px;
+        }
+
+        .logo-area h1{
+            color:#0f172a;
+            font-size:42px;
+            margin-bottom:10px;
+        }
+
+        .logo-area p{
+            color:#64748b;
+            font-size:18px;
+        }
+
+        .form-group{
+            margin-top:20px;
+        }
+
+        label{
+            display:block;
+            margin-bottom:8px;
+            color:#1e293b;
+            font-weight:600;
+        }
+
+        input{
+            width:100%;
+            padding:14px;
+            border:1px solid #cbd5e1;
+            border-radius:10px;
+            font-size:15px;
+            background:#f8fafc;
+            transition:0.2s;
+        }
+
+        input:focus{
+            outline:none;
+            border-color:#2563eb;
+            background:white;
+            box-shadow:0 0 0 3px rgba(37,99,235,0.15);
+        }
+
+        .btn-login{
+            width:100%;
+            margin-top:30px;
+            background:#2563eb;
+            color:white;
+            border:none;
+            padding:14px;
+            border-radius:10px;
+            font-size:16px;
+            font-weight:bold;
+            cursor:pointer;
+            transition:0.2s;
+        }
+
+        .btn-login:hover{
+            background:#1d4ed8;
+            transform:translateY(-1px);
+        }
+
+        .footer{
+            margin-top:25px;
+            text-align:center;
+            color:#94a3b8;
+            font-size:13px;
+        }
+
+        .logo{
+            width:320px;
+            height:auto;
+            object-fit:contain;
+            margin-bottom:15px;
+
+            filter: drop-shadow(0 8px 18px rgba(0,0,0,0.35));
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="login-container">
+
+        <div class="logo-area">
+
+            <!-- CAMBIA ESTA RUTA POR TU LOGO -->
+            <img src="{{ url_for('static', filename='logo.png') }}" class="logo">
+
+            <h1>INVENTARIO</h1>
+
+            <p>Sistema de Inventario de Obra CRV</p>
+
+        </div>
+
+        <form method="POST">
+
+            <div class="form-group">
+                <label>Usuario</label>
+                <input type="text" name="usuario" required>
+            </div>
+
+            <div class="form-group">
+                <label>Contraseña</label>
+                <input type="password" name="password" required>
+            </div>
+
+            <button type="submit" class="btn-login">
+                Ingresar
+            </button>
+
+        </form>
+
+        <div class="footer">
+            © SISTEMAS CRV
+        </div>
+
+    </div>
+
+</body>
+</html>

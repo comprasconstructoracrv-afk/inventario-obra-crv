@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<style>
+.salida-page-title{
+    background:white;
+    border-radius:22px;
+    padding:34px;
+    margin-bottom:28px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:20px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.08);
+}
+
+.salida-page-title .icono{
+    width:78px;
+    height:78px;
+    border-radius:50%;
+    background:#fee2e2;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:36px;
+}
+
+.salida-page-title h1{
+    margin:0;
+    font-size:36px;
+    color:#0f172a;
+}
+
+.salida-page-title p{
+    margin-top:8px;
+    color:#64748b;
+    font-size:16px;
+}
+
+.formulario-card{
+    background:white;
+    border-radius:22px;
+    padding:30px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.08);
+}
+
+.formulario-card h3{
+    color:#2563eb;
+    font-size:22px;
+    margin-bottom:25px;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:26px;
+}
+
+.form-group{
+    margin-bottom:22px;
+}
+
+.form-group label{
+    display:block;
+    margin-bottom:9px;
+    font-weight:700;
+    color:#0f172a;
+}
+
+.formulario-card input,
+.formulario-card select{
+    width:100%;
+    box-sizing:border-box;
+    padding:15px 16px;
+    border-radius:14px;
+    border:1px solid #cbd5e1;
+    background:#f8fafc;
+    font-size:15px;
+}
+
+.formulario-card input:focus,
+.formulario-card select:focus{
+    outline:none;
+    border-color:#2563eb;
+    background:white;
+    box-shadow:0 0 0 4px rgba(37,99,235,0.12);
+}
+
+.alerta-info{
+    background:#fff7ed;
+    border:1px solid #fdba74;
+    color:#c2410c;
+    padding:18px;
+    border-radius:16px;
+    font-weight:700;
+    margin-top:10px;
+}
+
+.acciones-formulario{
+    display:flex;
+    gap:15px;
+    margin-top:25px;
+}
+
+.btn-guardar{
+    background:#16a34a;
+    color:white;
+    border:none;
+    padding:16px 28px;
+    border-radius:14px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.btn-cancelar{
+    background:#0f172a;
+    color:white;
+    padding:16px 28px;
+    border-radius:14px;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+@media(max-width:1000px){
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+
+<div class="header-actions no-print">
+    <button onclick="window.history.back()" class="btn btn-dark">
+        Volver
+    </button>
+</div>
+
+<div class="salida-page-title">
+    <div class="icono">📤</div>
+
+    <div>
+        <h1>Nueva Salida</h1>
+        <p>Registro de materiales despachados a casas, zonas o puntos de obra.</p>
+    </div>
+</div>
+
+<form method="POST">
+
+    <div class="formulario-card">
+
+        <h3>Datos de la salida</h3>
+
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label>Producto</label>
+
+                <select name="producto_id" id="producto_id" required>
+                    <option value="">Seleccione un producto</option>
+
+                    {% for p in productos %}
+                        <option value="{{ p.id }}">
+                            {{ p.codigo }} - {{ p.nombre }} | Stock: {{ "{:,.2f}".format(p.stock).replace(",", "X").replace(".", ",").replace("X", ".") }} {{ p.unidad }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label>Bodega de salida</label>
+
+                <select name="obra_id" id="obra_id" required>
+
+                    <option value="">Seleccione una bodega</option>
+
+                    {% for e in existencias %}
+                    <option
+                        value="{{ e.obra.id }}"
+                        data-producto="{{ e.producto.id }}"
+                    >
+                        {{ e.obra.nombre }}
+                    </option>
+                    {% endfor %}
+
+                </select>
+            </div>
+
+        </div>
+
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label>Destino de salida</label>
+
+                <select name="destino_id" required>
+                    <option value="">Seleccione destino</option>
+
+                    {% for d in destinos %}
+                        <option value="{{ d.id }}">
+                            {{ d.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Cantidad a retirar</label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    name="cantidad"
+                    placeholder="Ingrese la cantidad"
+                    required
+                >
+            </div>
+
+        </div>
+
+        <div class="form-group">
+            <label>Observaciones</label>
+
+            <input
+                type="text"
+                name="observaciones"
+                placeholder="Ej: entregado a maestro, material para enchape, vivienda, urbanismo..."
+            >
+        </div>
+
+        <div class="alerta-info">
+            📤 Esta salida descontará automáticamente la cantidad del inventario de la bodega seleccionada.
+        </div>
+
+        <div class="acciones-formulario">
+
+            <button type="submit" class="btn-guardar">
+                💾 Guardar Salida
+            </button>
+
+            <a href="/movimientos" class="btn-cancelar">
+                Cancelar
+            </a>
+
+        </div>
+
+    </div>
+
+</form>
+
+<script>
+    const existencias = JSON.parse('{{ existencias_json | safe }}');
+
+    const productoSelect = document.getElementById("producto_id");
+    const bodegaSelect = document.getElementById("obra_id");
+
+    productoSelect.addEventListener("change", function () {
+        const productoId = this.value;
+
+        if (existencias[productoId]) {
+            bodegaSelect.value = existencias[productoId];
+        } else {
+            bodegaSelect.value = "";
+        }
+    });
+</script>
+
+{% endblock %}

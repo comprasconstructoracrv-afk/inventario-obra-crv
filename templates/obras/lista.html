@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="header-actions no-print">
+    <div class="left-actions">
+        <a class="btn btn-new" href="/obras/nueva">Nueva Bodega</a>
+    </div>
+
+    <div class="right-actions">
+        <a class="btn btn-excel" href="/obras/excel">Excel</a>
+        <a class="btn btn-pdf" href="/obras/pdf">PDF</a>
+        <button onclick="window.print()" class="btn btn-print">Imprimir</button>
+    </div>
+</div>
+
+<div class="page-header-card">
+    <h1>Bodegas</h1>
+    <p>Resumen general de bodegas y puntos de almacenamiento.</p>
+</div>
+
+<div class="bodega-grid">
+
+    {% for item in bodegas_data %}
+    <div class="bodega-card">
+
+        <div class="bodega-header">
+            <div>
+                <h2>{{ item.obra.nombre }}</h2>
+                <p>{{ item.obra.ubicacion }}</p>
+            </div>
+
+            <span class="badge-success">{{ item.obra.estado }}</span>
+        </div>
+
+        <div class="bodega-kpis">
+            <div>
+                <strong>{{ item.total_productos }}</strong>
+                <span>Productos</span>
+            </div>
+
+            <div>
+                <strong>
+                    {{ "{:,.2f}".format(item.total_cantidad).replace(",", "X").replace(".", ",").replace("X", ".") }}
+                </strong>
+                <span>Cantidad total</span>
+            </div>
+        </div>
+
+        <div class="bodega-actions no-print">
+            <a class="btn btn-small btn-edit" href="/obras/editar/{{ item.obra.id }}">✏️ Editar</a>
+            <a class="btn btn-small btn-delete" href="/obras/eliminar/{{ item.obra.id }}" onclick="return confirm('¿Eliminar esta bodega?')">🗑️ Eliminar</a>
+        </div>
+
+    </div>
+    {% endfor %}
+
+</div>
+
+{% endblock %}

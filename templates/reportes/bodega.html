@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Reporte por Bodega</h1>
+
+<p>Consulta de materiales disponibles en cada bodega o punto de inventario.</p>
+
+<div class="card no-print">
+    <form method="GET">
+        <label>Seleccione una bodega</label>
+        <select name="bodega_id" required>
+            <option value="">Seleccione...</option>
+
+            {% for b in bodegas %}
+            <option value="{{ b.id }}"
+                {% if bodega_seleccionada and bodega_seleccionada.id == b.id %}
+                    selected
+                {% endif %}
+            >
+                {{ b.nombre }}
+            </option>
+            {% endfor %}
+        </select>
+
+        <br><br>
+        <button type="submit">Consultar</button>
+    </form>
+</div>
+
+{% if bodega_seleccionada %}
+<div class="acciones no-print">
+    <a class="btn btn-success" href="/reportes/bodega/excel/{{ bodega_seleccionada.id }}">Exportar Excel</a>
+    <a class="btn" href="/reportes/bodega/pdf/{{ bodega_seleccionada.id }}">Exportar PDF</a>
+    <button onclick="window.print()" class="btn btn-dark">Imprimir</button>
+</div>
+
+<div class="card">
+    <h3>Reporte de Inventario por Bodega</h3>
+    <p><strong>Bodega:</strong> {{ bodega_seleccionada.nombre }}</p>
+    <p><strong>Ubicación:</strong> {{ bodega_seleccionada.ubicacion }}</p>
+    <p><strong>Responsable:</strong> {{ bodega_seleccionada.responsable }}</p>
+</div>
+
+<table>
+    <tr>
+        <th>Producto</th>
+        <th>Unidad</th>
+        <th>Cantidad disponible</th>
+        <th>Precio unitario</th>
+        <th>Valor estimado</th>
+    </tr>
+
+    {% set total = namespace(valor=0) %}
+
+    {% for e in existencias %}
+    {% set valor_linea = e.cantidad * e.producto.precio %}
+    {% set total.valor = total.valor + valor_linea %}
+
+    <tr>
+        <td>{{ e.producto.nombre }}</td>
+        <td class="text-center">{{ e.producto.unidad }}</td>
+        <td class="text-center">{{ e.cantidad }}</td>
+        <td class="text-center">$ {{ "{:,.0f}".format(e.producto.precio).replace(",", ".") }}</td>
+        <td class="text-center">$ {{ "{:,.0f}".format(valor_linea).replace(",", ".") }}</td>
+    </tr>
+    {% endfor %}
+
+    <tr>
+        <th colspan="4" style="text-align:right;">TOTAL ESTIMADO</th>
+        <th>$ {{ "{:,.0f}".format(total.valor).replace(",", ".") }}</th>
+    </tr>
+</table>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,323 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+.historial-page-title{
+    background:white;
+    border-radius:22px;
+    padding:34px;
+    margin-bottom:28px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:20px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.08);
+}
+
+.historial-page-title .icono{
+    width:78px;
+    height:78px;
+    border-radius:50%;
+    background:#dbeafe;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:36px;
+}
+
+.historial-page-title h1{
+    margin:0;
+    font-size:36px;
+    color:#0f172a;
+}
+
+.historial-page-title p{
+    margin-top:8px;
+    color:#64748b;
+    font-size:16px;
+}
+
+.historial-card{
+    background:white;
+    border-radius:22px;
+    padding:30px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.08);
+    margin-bottom:25px;
+}
+
+.historial-card h3{
+    color:#2563eb;
+    font-size:22px;
+    margin-bottom:25px;
+}
+
+.form-group label{
+    display:block;
+    margin-bottom:9px;
+    font-weight:700;
+    color:#0f172a;
+}
+
+.historial-card select{
+    width:100%;
+    box-sizing:border-box;
+    padding:15px 16px;
+    border-radius:14px;
+    border:1px solid #cbd5e1;
+    background:#f8fafc;
+    font-size:15px;
+}
+
+.historial-card select:focus{
+    outline:none;
+    border-color:#2563eb;
+    background:white;
+    box-shadow:0 0 0 4px rgba(37,99,235,0.12);
+}
+
+.acciones-historial{
+    display:flex;
+    gap:15px;
+    margin-top:22px;
+}
+
+.btn-consultar{
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:14px 25px;
+    border-radius:12px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.btn-pdf-historial{
+    background:#7c3aed;
+    color:white;
+    padding:14px 25px;
+    border-radius:12px;
+    font-weight:bold;
+    text-decoration:none;
+}
+
+.producto-resumen{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:16px;
+    margin-bottom:22px;
+}
+
+.resumen-box{
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    border-radius:16px;
+    padding:18px;
+}
+
+.resumen-box span{
+    display:block;
+    color:#64748b;
+    font-size:13px;
+    margin-bottom:8px;
+}
+
+.resumen-box strong{
+    color:#0f172a;
+    font-size:20px;
+}
+
+.table-card{
+    background:white;
+    border-radius:22px;
+    padding:18px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.08);
+}
+
+.historial-table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.historial-table th{
+    background:#0f172a;
+    color:white;
+    padding:14px;
+    text-align:center;
+}
+
+.historial-table th:first-child{
+    border-radius:12px 0 0 0;
+}
+
+.historial-table th:last-child{
+    border-radius:0 12px 0 0;
+}
+
+.historial-table td{
+    padding:13px;
+    border-bottom:1px solid #e5e7eb;
+    text-align:center;
+}
+
+.badge-ingreso{
+    background:#16a34a;
+    color:white;
+    padding:7px 12px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.badge-salida{
+    background:#dc2626;
+    color:white;
+    padding:7px 12px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:bold;
+}
+
+@media(max-width:1000px){
+    .producto-resumen{
+        grid-template-columns:1fr 1fr;
+    }
+}
+</style>
+
+<div class="historial-page-title">
+
+    <div class="icono">📚</div>
+
+    <div>
+        <h1>Historial por Producto</h1>
+        <p>Consulta ingresos, salidas, bodegas, destinos y movimientos del material.</p>
+    </div>
+
+</div>
+
+<div class="historial-card">
+
+    <h3>Consultar producto</h3>
+
+    <form method="GET">
+
+        <div class="form-group">
+            <label>Seleccione un producto</label>
+
+            <select name="producto_id" required>
+                <option value="">Seleccione...</option>
+
+                {% for p in productos %}
+                    <option value="{{ p.id }}"
+                        {% if producto_seleccionado and producto_seleccionado.id == p.id %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ p.codigo }} - {{ p.nombre }} - {{ p.unidad }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="acciones-historial">
+            <button type="submit" class="btn-consultar">
+                Consultar Historial
+            </button>
+
+            {% if producto_seleccionado %}
+            <a class="btn-pdf-historial"
+               href="/historial-producto/pdf/{{ producto_seleccionado.id }}">
+                Descargar PDF
+            </a>
+            {% endif %}
+        </div>
+
+    </form>
+
+</div>
+
+{% if producto_seleccionado %}
+
+<div class="historial-card">
+
+    <h3>Información del producto</h3>
+
+    <div class="producto-resumen">
+
+        <div class="resumen-box">
+            <span>Código</span>
+            <strong>{{ producto_seleccionado.codigo }}</strong>
+        </div>
+
+        <div class="resumen-box">
+            <span>Producto</span>
+            <strong>{{ producto_seleccionado.nombre }}</strong>
+        </div>
+
+        <div class="resumen-box">
+            <span>Unidad</span>
+            <strong>{{ producto_seleccionado.unidad }}</strong>
+        </div>
+
+        <div class="resumen-box">
+            <span>Stock actual</span>
+            <strong>
+                {{ "{:,.2f}".format(producto_seleccionado.stock).replace(",", "X").replace(".", ",").replace("X", ".") }}
+            </strong>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="table-card">
+
+    <table class="historial-table">
+
+        <tr>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Bodega</th>
+            <th>Destino</th>
+            <th>Cantidad</th>
+            <th>Observaciones</th>
+        </tr>
+
+        {% for m in movimientos %}
+        <tr>
+            <td>{{ m.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
+
+            <td>
+                {% if m.tipo == "INGRESO" %}
+                    <span class="badge-ingreso">INGRESO</span>
+                {% else %}
+                    <span class="badge-salida">SALIDA</span>
+                {% endif %}
+            </td>
+
+            <td>{{ m.obra.nombre if m.obra else "-" }}</td>
+
+            <td>
+                {% if m.destino %}
+                    {{ m.destino.nombre }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+
+            <td>
+                {{ "{:,.2f}".format(m.cantidad).replace(",", "X").replace(".", ",").replace("X", ".") }}
+            </td>
+
+            <td>{{ m.observaciones or "" }}</td>
+        </tr>
+        {% endfor %}
+
+    </table>
+
+</div>
+
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+.destino-page-title{
+    background:white;
+    border-radius:22px;
+    padding:34px;
+    margin-bottom:28px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:20px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.08);
+}
+
+.destino-page-title .icono{
+    width:78px;
+    height:78px;
+    border-radius:50%;
+    background:#dbeafe;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:36px;
+}
+
+.destino-page-title h1{
+    margin:0;
+    font-size:36px;
+    color:#0f172a;
+}
+
+.destino-page-title p{
+    margin-top:8px;
+    color:#64748b;
+    font-size:16px;
+}
+
+.formulario-card{
+    background:white;
+    border-radius:22px;
+    padding:30px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.08);
+}
+
+.formulario-card h3{
+    color:#2563eb;
+    font-size:22px;
+    margin-bottom:25px;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:26px;
+}
+
+.form-group{
+    margin-bottom:22px;
+}
+
+.form-group label{
+    display:block;
+    margin-bottom:9px;
+    font-weight:700;
+    color:#0f172a;
+}
+
+.formulario-card input,
+.formulario-card select{
+    width:100%;
+    box-sizing:border-box;
+    padding:15px 16px;
+    border-radius:14px;
+    border:1px solid #cbd5e1;
+    background:#f8fafc;
+    font-size:15px;
+}
+
+.acciones-formulario{
+    display:flex;
+    gap:15px;
+    margin-top:25px;
+}
+
+.btn-guardar{
+    background:#16a34a;
+    color:white;
+    border:none;
+    padding:16px 28px;
+    border-radius:14px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.btn-cancelar{
+    background:#0f172a;
+    color:white;
+    padding:16px 28px;
+    border-radius:14px;
+    text-decoration:none;
+    font-weight:bold;
+}
+</style>
+
+<div class="header-actions no-print">
+    <button onclick="window.history.back()" class="btn btn-dark">
+        Volver
+    </button>
+</div>
+
+<div class="destino-page-title">
+    <div class="icono">📍</div>
+
+    <div>
+        <h1>Editar Destino</h1>
+        <p>Modificar casa, zona o lugar de salida de material.</p>
+    </div>
+</div>
+
+<form method="POST">
+
+    <div class="formulario-card">
+
+        <h3>Datos del destino</h3>
+
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label>Nombre del destino</label>
+                <input type="text" name="nombre" value="{{ destino.nombre }}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Sector</label>
+                <input type="text" name="sector" value="{{ destino.sector }}" required>
+            </div>
+
+        </div>
+
+        <div class="form-group">
+            <label>Estado</label>
+
+            <select name="estado">
+                <option value="ACTIVO" {% if destino.estado == "ACTIVO" %}selected{% endif %}>
+                    ACTIVO
+                </option>
+
+                <option value="INACTIVO" {% if destino.estado == "INACTIVO" %}selected{% endif %}>
+                    INACTIVO
+                </option>
+            </select>
+        </div>
+
+        <div class="acciones-formulario">
+
+            <button type="submit" class="btn-guardar">
+                💾 Guardar Cambios
+            </button>
+
+            <a href="/destinos" class="btn-cancelar">
+                Cancelar
+            </a>
+
+        </div>
+
+    </div>
+
+</form>
+
+{% endblock %}
