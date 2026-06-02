@@ -1,64 +1,183 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Editar Producto</h1>
 
-<div class="card">
-    <form method="POST">
-        <label>Código</label>
-        <input type="text" name="codigo" value="{{ producto.codigo }}" required>
+<div class="titulo-pagina-card">
 
-        <label>Nombre</label>
-        <input type="text" name="nombre" value="{{ producto.nombre }}" required>
+    <div class="titulo-icono">
+        🧱
+    </div>
 
-        <label>Categoría</label>
-        <input type="text" name="categoria" value="{{ producto.categoria }}">
+    <div>
+        <h1>Editar Producto</h1>
+        <p>Modifique la información del producto seleccionado.</p>
+    </div>
 
-        <label>Unidad / Referencia</label>
-        <select name="unidad" id="unidad" onchange="mostrarOtraUnidad()" required>
-            <option value="{{ producto.unidad }}">{{ producto.unidad }}</option>
-            <option value="M2">M2</option>
-            <option value="UNIDADES">UNIDADES</option>
-            <option value="GALON">GALON</option>
-            <option value="CAJAS">CAJAS</option>
-            <option value="KILOGRAMO">KILOGRAMO</option>
-            <option value="PULGADAS">PULGADAS</option>
-            <option value="METRO LINEAL">METRO LINEAL</option>
-            <option value="PESO">PESO</option>
-            <option value="GRAMO">GRAMO</option>
-            <option value="OTRO">OTRO</option>
-        </select>
-
-        <div id="otraUnidadBox" style="display:none;">
-            <label>Escriba otra unidad / referencia</label>
-            <input type="text" name="otra_unidad" id="otra_unidad">
-        </div>
-
-        <label>Stock mínimo</label>
-        <input type="number" name="stock_minimo" step="0.01" value="{{ producto.stock_minimo }}">
-
-        <label>Precio unitario</label>
-        <input type="number" name="precio" step="0.01" value="{{ producto.precio }}">
-
-        <br><br>
-        <button type="submit">Guardar cambios</button>
-    </form>
 </div>
 
-<script>
-function mostrarOtraUnidad() {
-    const unidad = document.getElementById("unidad").value;
-    const otraBox = document.getElementById("otraUnidadBox");
-    const otraInput = document.getElementById("otra_unidad");
+<div class="formulario-card">
 
-    if (unidad === "OTRO") {
-        otraBox.style.display = "block";
-        otraInput.required = true;
-    } else {
-        otraBox.style.display = "none";
-        otraInput.required = false;
-        otraInput.value = "";
-    }
+    <h2 class="titulo-seccion">
+        Datos del producto
+    </h2>
+
+    <form method="POST">
+
+        <div class="form-group">
+            <label>Código</label>
+            <input type="text" name="codigo" value="{{ producto.codigo }}" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" name="nombre" value="{{ producto.nombre }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Categoría</label>
+            <input type="text" name="categoria" value="{{ producto.categoria }}">
+        </div>
+
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label>Unidad / Referencia</label>
+
+                <select name="unidad" required>
+                    <option {% if producto.unidad == "UNIDADES" %}selected{% endif %}>UNIDADES</option>
+                    <option {% if producto.unidad == "LIBRA" %}selected{% endif %}>LIBRA</option>
+                    <option {% if producto.unidad == "BULTO" %}selected{% endif %}>BULTO</option>
+                    <option {% if producto.unidad == "METROS" %}selected{% endif %}>METROS</option>
+                    <option {% if producto.unidad == "M3" %}selected{% endif %}>M3</option>
+                    <option {% if producto.unidad == "KILO" %}selected{% endif %}>KILO</option>
+                    <option {% if producto.unidad == "CAJAS" %}selected{% endif %}>CAJAS</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Stock mínimo</label>
+                <input type="number"
+                       step="0.01"
+                       name="stock_minimo"
+                       value="{{ producto.stock_minimo }}">
+            </div>
+
+        </div>
+
+        <div class="acciones-formulario">
+            <button type="submit" class="btn-guardar">
+                💾 Guardar cambios
+            </button>
+
+            <a href="{{ url_for('productos.listar_productos') }}" class="btn-cancelar">
+                Cancelar
+            </a>
+        </div>
+
+    </form>
+
+</div>
+
+<style>
+.titulo-pagina-card{
+    background:#fff;
+    border-radius:22px;
+    padding:34px;
+    margin-bottom:28px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:20px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.08);
 }
-</script>
+
+.titulo-icono{
+    width:78px;
+    height:78px;
+    border-radius:50%;
+    background:#dbeafe;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:36px;
+}
+
+.titulo-pagina-card h1{
+    margin:0;
+    font-size:34px;
+    color:#0f172a;
+}
+
+.titulo-pagina-card p{
+    margin-top:8px;
+    color:#64748b;
+}
+
+.formulario-card{
+    background:white;
+    border-radius:22px;
+    padding:34px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.08);
+}
+
+.titulo-seccion{
+    color:#2563eb;
+    font-size:24px;
+    margin-bottom:26px;
+}
+
+.form-group{
+    margin-bottom:22px;
+}
+
+.form-group label{
+    display:block;
+    font-weight:700;
+    margin-bottom:9px;
+    color:#0f172a;
+}
+
+.form-group input,
+.form-group select{
+    width:100%;
+    box-sizing:border-box;
+    padding:15px 16px;
+    border-radius:14px;
+    border:1px solid #cbd5e1;
+    background:#f8fafc;
+    font-size:15px;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:24px;
+}
+
+.acciones-formulario{
+    display:flex;
+    gap:15px;
+    margin-top:26px;
+}
+
+.btn-guardar{
+    background:#16a34a;
+    color:white;
+    border:none;
+    padding:14px 24px;
+    border-radius:12px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.btn-cancelar{
+    background:#0f172a;
+    color:white;
+    padding:14px 24px;
+    border-radius:12px;
+    font-weight:700;
+    text-decoration:none;
+}
+</style>
+
 {% endblock %}

@@ -70,14 +70,11 @@
 
                 </a>
 
-                <a class="btn btn-small btn-danger"
-                   href="/destinos/eliminar/{{ d.id }}"
-                   onclick="return confirm('¿Desactivar destino?')">
-
+                <a href="{{ url_for('destinos.eliminar_destino', id=d.id) }}"
+                class="btn btn-small btn-danger"
+                onclick="return confirm('¿Desea eliminar el destino {{ d.nombre }}?')">
                     Eliminar
-
                 </a>
-
             </td>
 
         </tr>

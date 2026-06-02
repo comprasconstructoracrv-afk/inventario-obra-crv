@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Recibo de Ingreso</title>
+<title>Recibo de Salida Múltiple</title>
 
 <style>
 body{
@@ -84,7 +84,7 @@ body{
     width:54px;
     height:54px;
     border-radius:50%;
-    background:#dcfce7;
+    background:#fee2e2;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -144,16 +144,25 @@ table{
     border-collapse:collapse;
 }
 
-td, th{
+th{
+    background:#f8fafc;
+    color:#0f172a;
+    font-size:12px;
     padding:9px;
     border-bottom:1px solid #e5e7eb;
-    font-size:12px;
+    text-align:center;
 }
 
-td:first-child{
-    width:230px;
+td{
+    padding:8px;
+    border-bottom:1px solid #e5e7eb;
+    font-size:12px;
+    text-align:center;
+}
+
+td.producto{
+    text-align:left;
     font-weight:bold;
-    background:#f8fafc;
 }
 
 .resumen{
@@ -274,6 +283,8 @@ td:first-child{
 
 <body>
 
+{% set primer = movimientos[0] if movimientos else None %}
+
 <div class="recibo">
 
     <div class="header">
@@ -287,99 +298,124 @@ td:first-child{
         </div>
 
         <div class="recibo-numero">
-            <h2>RECIBO DE INGRESO</h2>
-            <strong>N° {{ movimiento.id if movimiento is defined else '' }}</strong>
+            <h2>RECIBO DE SALIDA MÚLTIPLE</h2>
+            <strong>
+                N°
+                {% if primer %}
+                    {{ primer.id }}
+                {% else %}
+                    -
+                {% endif %}
+            </strong>
         </div>
     </div>
 
     <div class="titulo">
-        <div class="icono">📥</div>
+        <div class="icono">📤</div>
 
         <div>
-            <h2>INGRESO DE MATERIAL</h2>
-            <p>Registro de material recibido y cargado al inventario.</p>
+            <h2>SALIDA MÚLTIPLE DE MATERIAL</h2>
+            <p>Registro de varios materiales despachados a un mismo destino.</p>
         </div>
     </div>
 
     <div class="info-grid">
+
         <div class="info-item">
-            <span>FECHA DE INGRESO</span>
-            <strong>{{ fecha_ingreso }}</strong>
+            <span>FECHA DE SALIDA</span>
+            <strong>
+                {% if primer %}
+                    {{ primer.fecha.strftime('%d/%m/%Y %I:%M %p') }}
+                {% else %}
+                    -
+                {% endif %}
+            </strong>
         </div>
 
         <div class="info-item">
-            <span>RESPONSABLE</span>
-            <strong>{{ responsable or 'SIN RESPONSABLE' }}</strong>
+            <span>USUARIO QUE REGISTRA</span>
+            <strong>{{ current_user.nombre }}</strong>
         </div>
 
         <div class="info-item">
-            <span>BODEGA DE INGRESO</span>
-            <strong>{{ bodega.nombre if bodega else 'SIN BODEGA' }}</strong>
+            <span>DESTINO</span>
+            <strong>
+                {% if primer and primer.destino %}
+                    {{ primer.destino.nombre }}
+                {% else %}
+                    -
+                {% endif %}
+            </strong>
         </div>
 
         <div class="info-item">
             <span>ESTADO</span>
             <strong style="color:#16a34a;">COMPLETADO</strong>
         </div>
+
     </div>
 
     <div class="seccion">
         <div class="seccion-titulo">
-            DETALLE DEL INGRESO
+            DETALLE DE PRODUCTOS ENTREGADOS
         </div>
 
         <table>
             <tr>
-                <td>Producto</td>
-                <td>{{ producto.nombre }}</td>
+                <th>Código</th>
+                <th>Producto</th>
+                <th>Bodega</th>
+                <th>Cantidad</th>
+                <th>Unidad</th>
+                <th>Observaciones</th>
             </tr>
 
+            {% for m in movimientos %}
             <tr>
-                <td>Código</td>
-                <td>{{ producto.codigo }}</td>
-            </tr>
+                <td>{{ m.producto.codigo if m.producto else '' }}</td>
 
-            <tr>
-                <td>Unidad</td>
-                <td>{{ producto.unidad }}</td>
-            </tr>
+                <td class="producto">
+                    {{ m.producto.nombre if m.producto else 'SIN PRODUCTO' }}
+                </td>
 
-            <tr>
-                <td>Bodega de ingreso</td>
-                <td>{{ bodega.nombre if bodega else '' }}</td>
-            </tr>
+                <td>{{ m.obra.nombre if m.obra else 'SIN BODEGA' }}</td>
 
-            <tr>
-                <td>Cantidad ingresada</td>
                 <td>
-                    {{ "{:,.2f}".format(cantidad).replace(",", "X").replace(".", ",").replace("X", ".") }}
-                    {{ producto.unidad }}
+                    {{ "{:,.2f}".format(m.cantidad).replace(",", "X").replace(".", ",").replace("X", ".") }}
+                </td>
+
+                <td>
+                    {{ m.producto.unidad if m.producto else '' }}
+                </td>
+
+                <td>
+                    {{ m.observaciones or '' }}
                 </td>
             </tr>
-
-            <tr>
-                <td>Observaciones</td>
-                <td>{{ observaciones or 'SIN OBSERVACIONES' }}</td>
-            </tr>
+            {% endfor %}
         </table>
     </div>
 
     <div class="resumen">
         <div class="resumen-box">
-            <span>PRODUCTO</span>
-            <strong>{{ producto.nombre }}</strong>
+            <span>TOTAL PRODUCTOS</span>
+            <strong>{{ movimientos|length }}</strong>
         </div>
 
         <div class="resumen-box">
-            <span>CANTIDAD</span>
+            <span>DESTINO</span>
             <strong>
-                {{ "{:,.2f}".format(cantidad).replace(",", "X").replace(".", ",").replace("X", ".") }}
+                {% if primer and primer.destino %}
+                    {{ primer.destino.nombre }}
+                {% else %}
+                    -
+                {% endif %}
             </strong>
         </div>
 
         <div class="resumen-box">
             <span>TIPO DE MOVIMIENTO</span>
-            <strong>INGRESO</strong>
+            <strong>SALIDA</strong>
         </div>
     </div>
 
@@ -408,7 +444,7 @@ td:first-child{
     </div>
 
     <div class="nota">
-        Este documento es un comprobante de ingreso de material al inventario.
+        Este documento es un comprobante de salida múltiple de material.
         Conserve este recibo para control y respaldo de la operación.
     </div>
 
@@ -421,8 +457,8 @@ td:first-child{
             🖨 Imprimir recibo
         </button>
 
-        <a href="/productos" class="btn">
-            Volver a productos
+        <a href="/movimientos" class="btn">
+            Volver a salidas
         </a>
     </div>
 

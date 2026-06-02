@@ -3,7 +3,7 @@
 {% block content %}
 
 <style>
-.consumo-title-card{
+.consumo-page-title{
     background:white;
     border-radius:22px;
     padding:34px;
@@ -15,7 +15,7 @@
     box-shadow:0 6px 20px rgba(0,0,0,0.08);
 }
 
-.consumo-title-card .icono{
+.consumo-page-title .icono{
     width:78px;
     height:78px;
     border-radius:50%;
@@ -26,174 +26,114 @@
     font-size:36px;
 }
 
-.consumo-title-card h1{
+.consumo-page-title h1{
     margin:0;
     font-size:36px;
     color:#0f172a;
 }
 
-.consumo-title-card p{
+.consumo-page-title p{
     margin-top:8px;
     color:#64748b;
     font-size:16px;
 }
 
-.destinos-grid{
-    display:grid;
-    grid-template-columns:repeat(4, 1fr);
-    gap:22px;
-}
-
-.destino-card{
+.consulta-card{
     background:white;
-    border-radius:18px;
-    padding:22px;
-    box-shadow:0 6px 18px rgba(0,0,0,0.08);
+    border-radius:22px;
+    padding:34px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.08);
 }
 
-.destino-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:12px;
-}
-
-.destino-card h3{
-    margin:0;
+.consulta-card h3{
+    color:#2563eb;
     font-size:22px;
-    color:#0f172a;
+    margin-bottom:25px;
 }
 
-.destino-card p{
-    color:#64748b;
-    margin:6px 0 0;
-}
-
-.badge-sector{
-    background:#16a34a;
-    color:white;
-    font-size:12px;
-    font-weight:bold;
-    padding:6px 12px;
-    border-radius:999px;
-}
-
-.destino-kpis{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
-    margin-top:20px;
-}
-
-.destino-kpis div{
-    background:#f3f4f6;
-    border-radius:14px;
-    padding:16px 10px;
-    text-align:center;
-}
-
-.destino-kpis strong{
+.consulta-card label{
     display:block;
-    font-size:24px;
+    margin-bottom:10px;
+    font-weight:700;
     color:#0f172a;
 }
 
-.destino-kpis span{
-    font-size:13px;
-    color:#64748b;
+.consulta-card select{
+    width:100%;
+    padding:15px 16px;
+    border-radius:14px;
+    border:1px solid #cbd5e1;
+    background:#f8fafc;
+    font-size:15px;
+    margin-bottom:22px;
 }
 
-.destino-actions{
-    display:flex;
-    justify-content:flex-end;
-    margin-top:18px;
+.consulta-card select:focus{
+    outline:none;
+    border-color:#2563eb;
+    background:white;
+    box-shadow:0 0 0 4px rgba(37,99,235,0.12);
 }
 
-.btn-ver-reporte{
-    background:#0f766e;
+.btn-consultar{
+    background:#2563eb;
     color:white;
-    padding:11px 18px;
-    border-radius:10px;
-    text-decoration:none;
+    border:none;
+    padding:15px 26px;
+    border-radius:14px;
     font-weight:bold;
-}
-
-.btn-ver-reporte:hover{
-    background:#115e59;
-}
-
-@media(max-width:1300px){
-    .destinos-grid{
-        grid-template-columns:repeat(3, 1fr);
-    }
-}
-
-@media(max-width:950px){
-    .destinos-grid{
-        grid-template-columns:repeat(2, 1fr);
-    }
-}
-
-@media(max-width:650px){
-    .destinos-grid{
-        grid-template-columns:1fr;
-    }
+    cursor:pointer;
+    text-decoration:none;
 }
 </style>
 
-<div class="consumo-title-card">
+<div class="consumo-page-title">
 
     <div class="icono">🏠</div>
 
     <div>
         <h1>Consumo por Destino</h1>
-        <p>Consulte materiales enviados a casas, zonas y frentes de obra.</p>
+        <p>Consulta materiales enviados a casas, zonas y frentes de obra.</p>
     </div>
 
 </div>
 
-<div class="destinos-grid">
+<div class="consulta-card">
 
-    {% for destino in destinos %}
+    <h3>Consultar destino</h3>
 
-    <div class="destino-card">
+    <form id="formDestino">
 
-        <div class="destino-header">
-            <div>
-                <h3>{{ destino.nombre }}</h3>
-                <p>{{ destino.sector }}</p>
-            </div>
+        <label>Seleccione un destino</label>
 
-            <span class="badge-sector">
-                ACTIVO
-            </span>
-        </div>
+        <select id="destino_id" required>
+            <option value="">Seleccione...</option>
 
-        <div class="destino-kpis">
+            {% for destino in destinos %}
+            <option value="{{ destino.id }}">
+                {{ destino.nombre }}
+            </option>
+            {% endfor %}
+        </select>
 
-            <div>
-                <strong>{{ destino.total_productos if destino.total_productos else 0 }}</strong>
-                <span>Productos usados</span>
-            </div>
+        <button type="submit" class="btn-consultar">
+            Consultar Consumo
+        </button>
 
-            <div>
-                <strong>{{ destino.total_cantidad if destino.total_cantidad else "0,00" }}</strong>
-                <span>Cantidad total</span>
-            </div>
-
-        </div>
-
-        <div class="destino-actions">
-            <a class="btn-ver-reporte"
-               href="{{ url_for('consumos.detalle_destino', destino_id=destino.id) }}">
-                Ver reporte
-            </a>
-        </div>
-
-    </div>
-
-    {% endfor %}
+    </form>
 
 </div>
+
+<script>
+document.getElementById("formDestino").addEventListener("submit", function(e){
+    e.preventDefault();
+
+    let destino = document.getElementById("destino_id").value;
+
+    if(destino){
+        window.location.href = "/consumos/destino/" + destino;
+    }
+});
+</script>
 
 {% endblock %}

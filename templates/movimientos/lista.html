@@ -64,10 +64,17 @@
 
 <div class="movimientos-toolbar no-print">
 
-    <a class="btn btn-success" href="/movimientos/nuevo">
-        + Nueva Salida
-    </a>
+    <div style="display:flex; gap:10px;">
 
+        <a class="btn btn-success" href="/movimientos/nuevo">
+            + Nueva Salida
+        </a>
+
+        <a class="btn btn-dark" href="/movimientos/nuevo-multiple">
+            + Salida Múltiple
+        </a>
+
+    </div>
     <form method="GET" class="movimientos-search">
         <input
             type="text"
@@ -98,7 +105,9 @@
 
         {% for m in movimientos %}
         <tr>
-            <td>{{ m.fecha }}</td>
+            <td>
+                {{ m.fecha.strftime('%d/%m/%Y %H:%M') }}
+            </td>
 
             <td>{{ m.producto.nombre if m.producto else "SIN PRODUCTO" }}</td>
 
@@ -123,12 +132,11 @@
                     Editar
                 </a>
 
-                <a class="btn btn-small btn-danger"
-                   href="/movimientos/eliminar/{{ m.id }}"
-                   onclick="return confirm('¿Eliminar esta salida? Esto devolverá el stock a la bodega.')">
+                <a href="/movimientos/eliminar/{{ m.id }}"
+                class="btn btn-small btn-danger"
+                onclick="return confirm('¿Desea eliminar esta salida de material?')">
                     Eliminar
                 </a>
-            </td>
         </tr>
         {% endfor %}
     </table>

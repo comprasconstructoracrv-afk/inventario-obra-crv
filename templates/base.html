@@ -864,5 +864,34 @@
         {% block content %}{% endblock %}
     </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+function confirmarEliminar(event, mensaje) {
+    event.preventDefault();
+
+    const url = event.currentTarget.href;
+
+    Swal.fire({
+        title: '¿Confirmar eliminación?',
+        text: mensaje,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+        background: '#ffffff',
+        borderRadius: '15px'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = url;
+        }
+    });
+
+    return false;
+}
+</script>
+
 </body>
 </html>

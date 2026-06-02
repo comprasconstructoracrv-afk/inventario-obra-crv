@@ -49,7 +49,11 @@
 
         <div class="bodega-actions no-print">
             <a class="btn btn-small btn-edit" href="/obras/editar/{{ item.obra.id }}">✏️ Editar</a>
-            <a class="btn btn-small btn-delete" href="/obras/eliminar/{{ item.obra.id }}" onclick="return confirm('¿Eliminar esta bodega?')">🗑️ Eliminar</a>
+            <a href="/obras/eliminar/{{ item.obra.id }}"
+            class="btn btn-small btn-danger"
+            onclick="return confirm('¿Desea eliminar la bodega {{ item.obra.nombre }}?')">
+                🗑 Eliminar
+            </a>
         </div>
 
     </div>

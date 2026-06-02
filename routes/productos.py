@@ -7,6 +7,7 @@ from models.obra import Obra
 from models.existencia import Existencia
 from models.movimiento import Movimiento
 from extensions import db
+from flask import redirect, url_for
 
 productos_bp = Blueprint("productos", __name__)
 
@@ -224,6 +225,18 @@ def eliminar_producto(id):
 
     # borrar producto
     db.session.delete(producto)
+    db.session.commit()
+
+    return redirect(url_for("productos.listar_productos"))
+
+@productos_bp.route("/productos/limpiar-pruebas")
+@login_required
+def limpiar_pruebas():
+
+    Movimiento.query.delete()
+    Existencia.query.delete()
+    Producto.query.delete()
+
     db.session.commit()
 
     return redirect(url_for("productos.listar_productos"))

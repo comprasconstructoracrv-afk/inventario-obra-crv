@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header-card">
+    <h1>Salida Múltiple</h1>
+    <p>Registrar varios productos en una sola salida.</p>
+</div>
+
+<div class="formulario-card">
+
+    <form method="POST">
+
+        <label>Destino</label>
+
+        <select name="destino_id">
+            {% for d in destinos %}
+            <option value="{{ d.id }}">
+                {{ d.nombre }}
+            </option>
+            {% endfor %}
+        </select>
+
+        <br><br>
+
+        <label>Observaciones generales</label>
+
+        <input type="text" name="observaciones">
+
+        <br><br>
+
+        <h3>Productos</h3>
+
+        <table id="tablaProductos">
+
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+            </tr>
+
+            <tr>
+                <td>
+                    <select name="producto_id[]">
+
+                        {% for p in productos %}
+                        <option value="{{ p.id }}">
+                            {{ p.codigo }} - {{ p.nombre }}
+                        </option>
+                        {% endfor %}
+
+                    </select>
+                </td>
+
+                <td>
+                    <input
+                        type="number"
+                        step="0.01"
+                        name="cantidad[]"
+                    >
+                </td>
+            </tr>
+
+        </table>
+
+        <br>
+
+        <button type="button" onclick="agregarFila()">
+            + Agregar Producto
+        </button>
+
+        <button type="submit">
+            Guardar Salida
+        </button>
+
+    </form>
+
+</div>
+
+<script>
+function agregarFila(){
+
+    let tabla =
+        document.getElementById(
+            "tablaProductos"
+        );
+
+    let fila =
+        tabla.insertRow(-1);
+
+    fila.innerHTML = tabla.rows[1].innerHTML;
+}
+</script>
+
+{% endblock %}

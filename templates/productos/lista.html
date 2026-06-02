@@ -124,9 +124,9 @@
                     Editar
                 </a>
 
-                <a class="btn btn-small btn-danger"
-                   href="/productos/eliminar/{{ p.id }}"
-                   onclick="return confirm('¿Eliminar este producto?')">
+                <a href="/productos/eliminar/{{ p.id }}"
+                class="btn btn-small btn-danger"
+                onclick="return confirm('¿Desea eliminar el producto {{ p.nombre }}?')">
                     Eliminar
                 </a>
             </td>

@@ -8,6 +8,7 @@ from extensions import db
 from models.destino import Destino
 from models.existencia import Existencia
 import json
+from flask import render_template, request, redirect, url_for
 
 movimientos_bp = Blueprint("movimientos", __name__)
 
@@ -152,7 +153,7 @@ def nuevo_movimiento():
         db.session.commit()
 
         return redirect(
-            url_for("movimientos.listar_movimientos")
+            url_for("movimientos.recibo_salida", id=movimiento.id)
         )
 
     return render_template(
@@ -217,3 +218,141 @@ def eliminar_movimiento(id):
     db.session.commit()
 
     return redirect(url_for("movimientos.listar_movimientos"))
+
+@movimientos_bp.route("/movimientos/recibo-salida/<int:id>")
+@login_required
+def recibo_salida(id):
+    movimiento = Movimiento.query.get_or_404(id)
+
+    return render_template(
+        "movimientos/recibo_salida.html",
+        movimiento=movimiento
+    )
+
+@movimientos_bp.route(
+    "/movimientos/recibo-salida-multiple"
+)
+@login_required
+def recibo_salida_multiple():
+
+    ids = request.args.get(
+        "ids",
+        ""
+    )
+
+    lista_ids = [
+        int(x)
+        for x in ids.split(",")
+        if x
+    ]
+
+    movimientos = Movimiento.query.filter(
+        Movimiento.id.in_(lista_ids)
+    ).all()
+
+    return render_template(
+        "movimientos/recibo_salida_multiple.html",
+        movimientos=movimientos
+    )
+
+@movimientos_bp.route(
+    "/movimientos/nuevo-multiple",
+    methods=["GET", "POST"]
+)
+@login_required
+def nuevo_movimiento_multiple():
+
+    productos = Producto.query.order_by(
+        Producto.nombre.asc()
+    ).all()
+
+    destinos = Destino.query.filter_by(
+        activo=True
+    ).order_by(
+        Destino.nombre.asc()
+    ).all()
+
+    if request.method == "POST":
+
+        destino_id = int(
+            request.form["destino_id"]
+        )
+
+        observaciones = request.form.get(
+            "observaciones",
+            ""
+        ).upper()
+
+        productos_ids = request.form.getlist(
+            "producto_id[]"
+        )
+
+        cantidades = request.form.getlist(
+            "cantidad[]"
+        )
+
+        movimientos_creados = []
+
+        for producto_id, cantidad in zip(
+            productos_ids,
+            cantidades
+        ):
+
+            if not cantidad:
+                continue
+
+            producto_id = int(producto_id)
+            cantidad = float(cantidad)
+
+            existencia = Existencia.query.filter(
+                Existencia.producto_id == producto_id,
+                Existencia.cantidad > 0
+            ).first()
+
+            if not existencia:
+                return f"No existe inventario para el producto ID {producto_id}"
+
+            ok, mensaje = aplicar_movimiento(
+                producto_id,
+                existencia.obra_id,
+                "SALIDA",
+                cantidad
+            )
+
+            if not ok:
+                return mensaje
+
+            movimiento = Movimiento(
+                producto_id=producto_id,
+                obra_id=existencia.obra_id,
+                tipo="SALIDA",
+                cantidad=cantidad,
+                destino_id=destino_id,
+                observaciones=observaciones
+            )
+
+            db.session.add(movimiento)
+
+            movimientos_creados.append(
+                movimiento
+            )
+
+        db.session.commit()
+
+        ids = [
+            str(m.id)
+            for m in movimientos_creados
+        ]
+
+        return redirect(
+            url_for(
+                "movimientos.recibo_salida_multiple",
+                ids=",".join(ids)
+            )
+        )
+
+    return render_template(
+        "movimientos/nuevo_multiple.html",
+        productos=productos,
+        destinos=destinos
+    )

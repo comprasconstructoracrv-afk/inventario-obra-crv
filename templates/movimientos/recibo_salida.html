@@ -2,22 +2,22 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Recibo de Ingreso</title>
+<title>Recibo de Salida</title>
 
 <style>
 body{
-    font-family:Arial, sans-serif;
+    font-family: Arial, sans-serif;
     background:#f3f4f6;
-    padding:20px;
+    padding:30px;
     color:#0f172a;
 }
 
 .recibo{
-    max-width:900px;
+    max-width:850px;
     margin:auto;
     background:white;
     border-radius:18px;
-    padding:22px;
+    padding:20px;
     box-shadow:0 6px 22px rgba(0,0,0,.12);
 }
 
@@ -26,106 +26,103 @@ body{
     justify-content:space-between;
     align-items:center;
     border-bottom:3px solid #0f172a;
-    padding-bottom:14px;
+    padding-bottom:20px;
 }
 
 .logo-box{
     display:flex;
     align-items:center;
-    gap:14px;
+    gap:18px;
 }
 
 .logo-box img{
-    width:80px;
+    width:85px;
 }
 
 .logo-box h1{
     margin:0;
-    font-size:24px;
-    line-height:1.1;
+    font-size:30px;
 }
 
 .logo-box p{
-    margin:4px 0 0;
+    margin:5px 0 0;
     color:#64748b;
-    font-size:13px;
 }
 
 .recibo-numero{
     background:#0f172a;
     color:white;
-    padding:16px 22px;
+    padding:22px 30px;
     border-radius:14px;
     text-align:center;
 }
 
 .recibo-numero h2{
     margin:0;
-    font-size:16px;
+    font-size:22px;
 }
 
 .recibo-numero strong{
     color:#f59e0b;
-    font-size:20px;
+    font-size:24px;
 }
 
 .titulo{
-    margin:14px 0;
-    padding:16px;
+    margin:15px 0;
+    padding:25px;
     border:1px solid #e5e7eb;
     border-radius:16px;
     display:flex;
     justify-content:center;
     align-items:center;
-    gap:14px;
+    gap:18px;
 }
 
 .icono{
-    width:54px;
-    height:54px;
+    width:70px;
+    height:70px;
     border-radius:50%;
-    background:#dcfce7;
+    background:#fee2e2;
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:26px;
+    font-size:34px;
 }
 
 .titulo h2{
     margin:0;
-    font-size:22px;
+    font-size:28px;
 }
 
 .titulo p{
-    margin:4px 0 0;
+    margin:6px 0 0;
     color:#64748b;
-    font-size:13px;
 }
 
 .info-grid{
     display:grid;
     grid-template-columns:repeat(4,1fr);
-    gap:10px;
+    gap:15px;
     border:1px solid #e5e7eb;
     border-radius:14px;
-    padding:12px;
-    margin-bottom:14px;
+    padding:18px;
+    margin-bottom:22px;
 }
 
 .info-item span{
     display:block;
-    font-size:11px;
+    font-size:12px;
     color:#64748b;
     font-weight:bold;
-    margin-bottom:5px;
+    margin-bottom:8px;
 }
 
 .info-item strong{
-    font-size:13px;
+    font-size:15px;
 }
 
 .seccion{
-    margin-top:14px;
+    margin-top:22px;
     border:1px solid #e5e7eb;
     border-radius:14px;
     overflow:hidden;
@@ -134,9 +131,8 @@ body{
 .seccion-titulo{
     background:#0f172a;
     color:white;
-    padding:10px 14px;
+    padding:14px 18px;
     font-weight:bold;
-    font-size:13px;
 }
 
 table{
@@ -145,9 +141,9 @@ table{
 }
 
 td, th{
-    padding:9px;
+    padding:8px;
     border-bottom:1px solid #e5e7eb;
-    font-size:12px;
+    text-align:left;
 }
 
 td:first-child{
@@ -156,91 +152,52 @@ td:first-child{
     background:#f8fafc;
 }
 
-.resumen{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:10px;
-    margin-top:14px;
-}
-
-.resumen-box{
-    background:#f8fafc;
-    border:1px solid #e5e7eb;
-    border-radius:12px;
-    padding:12px;
-    text-align:center;
-}
-
-.resumen-box span{
-    display:block;
-    color:#64748b;
-    font-size:11px;
-    font-weight:bold;
-    margin-bottom:6px;
-}
-
-.resumen-box strong{
-    font-size:18px;
-    color:#0f172a;
-}
-
 .firmas{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:24px;
-    padding:12px;
+    gap:30px;
+    padding:10px;
 }
 
 .firma-box{
     min-height:70px;
 }
 
-.firma-box strong{
-    font-size:12px;
-}
-
-.firma-box p{
-    margin:6px 0;
-    font-size:12px;
-}
-
 .linea{
     border-bottom:1px solid #0f172a;
-    margin-top:18px;
-    margin-bottom:8px;
+    margin-top:35px;
+    margin-bottom:10px;
 }
 
 .nota{
     background:#eff6ff;
     color:#1d4ed8;
     border:1px solid #bfdbfe;
-    padding:10px;
-    border-radius:12px;
-    margin-top:14px;
-    font-size:12px;
+    padding:16px;
+    border-radius:14px;
+    margin-top:25px;
     font-weight:600;
 }
 
 .footer{
-    margin-top:14px;
+    margin-top:30px;
     text-align:center;
     border-top:3px solid #f59e0b;
     background:#0f172a;
     color:white;
-    padding:12px;
+    padding:18px;
     border-radius:0 0 14px 14px;
-    font-size:12px;
 }
 
 .acciones{
     text-align:center;
-    margin-top:16px;
+    margin-top:25px;
 }
 
 .btn{
     background:#0f172a;
     color:white;
-    padding:10px 16px;
+    padding:12px 20px;
     border-radius:10px;
     border:none;
     text-decoration:none;
@@ -249,11 +206,6 @@ td:first-child{
 }
 
 @media print{
-    @page{
-        size:A4;
-        margin:8mm;
-    }
-
     body{
         background:white;
         padding:0;
@@ -262,12 +214,16 @@ td:first-child{
     .recibo{
         box-shadow:none;
         max-width:100%;
-        padding:10px;
     }
 
     .acciones{
         display:none;
     }
+
+@page{
+size:A4;
+margin:8mm;
+}
 }
 </style>
 </head>
@@ -279,7 +235,6 @@ td:first-child{
     <div class="header">
         <div class="logo-box">
             <img src="{{ url_for('static', filename='logo.png') }}">
-
             <div>
                 <h1>INVENTARIO DE OBRA</h1>
                 <p>Sistema Profesional de Control de Inventario</p>
@@ -287,34 +242,33 @@ td:first-child{
         </div>
 
         <div class="recibo-numero">
-            <h2>RECIBO DE INGRESO</h2>
-            <strong>N° {{ movimiento.id if movimiento is defined else '' }}</strong>
+            <h2>RECIBO DE SALIDA</h2>
+            <strong>N° {{ movimiento.id }}</strong>
         </div>
     </div>
 
     <div class="titulo">
-        <div class="icono">📥</div>
-
+        <div class="icono">📤</div>
         <div>
-            <h2>INGRESO DE MATERIAL</h2>
-            <p>Registro de material recibido y cargado al inventario.</p>
+            <h2>SALIDA DE MATERIAL</h2>
+            <p>Registro de materiales despachados a casas, zonas o puntos de obra.</p>
         </div>
     </div>
 
     <div class="info-grid">
         <div class="info-item">
-            <span>FECHA DE INGRESO</span>
-            <strong>{{ fecha_ingreso }}</strong>
+            <span>FECHA DE SALIDA</span>
+            <strong>{{ movimiento.fecha.strftime('%d/%m/%Y %I:%M %p') if movimiento.fecha else '' }}</strong>
         </div>
 
         <div class="info-item">
-            <span>RESPONSABLE</span>
-            <strong>{{ responsable or 'SIN RESPONSABLE' }}</strong>
+            <span>USUARIO QUE REGISTRA</span>
+            <strong>{{ current_user.nombre }}</strong>
         </div>
 
         <div class="info-item">
-            <span>BODEGA DE INGRESO</span>
-            <strong>{{ bodega.nombre if bodega else 'SIN BODEGA' }}</strong>
+            <span>BODEGA DE ORIGEN</span>
+            <strong>{{ movimiento.obra.nombre if movimiento.obra else 'SIN BODEGA' }}</strong>
         </div>
 
         <div class="info-item">
@@ -324,70 +278,53 @@ td:first-child{
     </div>
 
     <div class="seccion">
-        <div class="seccion-titulo">
-            DETALLE DEL INGRESO
-        </div>
+        <div class="seccion-titulo">DETALLE DE LA SALIDA</div>
 
         <table>
             <tr>
                 <td>Producto</td>
-                <td>{{ producto.nombre }}</td>
+                <td>{{ movimiento.producto.nombre if movimiento.producto else 'SIN PRODUCTO' }}</td>
             </tr>
 
             <tr>
                 <td>Código</td>
-                <td>{{ producto.codigo }}</td>
+                <td>{{ movimiento.producto.codigo if movimiento.producto else '' }}</td>
             </tr>
 
             <tr>
-                <td>Unidad</td>
-                <td>{{ producto.unidad }}</td>
+                <td>Bodega de salida</td>
+                <td>{{ movimiento.obra.nombre if movimiento.obra else 'SIN BODEGA' }}</td>
             </tr>
 
             <tr>
-                <td>Bodega de ingreso</td>
-                <td>{{ bodega.nombre if bodega else '' }}</td>
-            </tr>
-
-            <tr>
-                <td>Cantidad ingresada</td>
+                <td>Destino de salida</td>
                 <td>
-                    {{ "{:,.2f}".format(cantidad).replace(",", "X").replace(".", ",").replace("X", ".") }}
-                    {{ producto.unidad }}
+                    {{ movimiento.destino.nombre if movimiento.destino else 'SIN DESTINO' }}
+                    {% if movimiento.destino %}
+                        - Sector: {{ movimiento.destino.sector }}
+                    {% endif %}
+                </td>
+            </tr>
+
+            <tr>
+                <td>Cantidad retirada</td>
+                <td>
+                    {{ "{:,.2f}".format(movimiento.cantidad).replace(",", "X").replace(".", ",").replace("X", ".") }}
+                    {{ movimiento.producto.unidad if movimiento.producto else '' }}
                 </td>
             </tr>
 
             <tr>
                 <td>Observaciones</td>
-                <td>{{ observaciones or 'SIN OBSERVACIONES' }}</td>
+                <td>{{ movimiento.observaciones or 'SIN OBSERVACIONES' }}</td>
             </tr>
         </table>
     </div>
 
-    <div class="resumen">
-        <div class="resumen-box">
-            <span>PRODUCTO</span>
-            <strong>{{ producto.nombre }}</strong>
-        </div>
-
-        <div class="resumen-box">
-            <span>CANTIDAD</span>
-            <strong>
-                {{ "{:,.2f}".format(cantidad).replace(",", "X").replace(".", ",").replace("X", ".") }}
-            </strong>
-        </div>
-
-        <div class="resumen-box">
-            <span>TIPO DE MOVIMIENTO</span>
-            <strong>INGRESO</strong>
-        </div>
-    </div>
-
     <div class="seccion">
-        <div class="seccion-titulo">FIRMAS</div>
+        <div class="seccion-titulo">INFORMACIÓN ADICIONAL</div>
 
         <div class="firmas">
-
             <div class="firma-box">
                 <strong>Responsable de entrega</strong>
                 <p>Nombre:</p>
@@ -403,12 +340,31 @@ td:first-child{
                 <p>Firma:</p>
                 <div class="linea"></div>
             </div>
-
         </div>
     </div>
 
+    <div class="seccion">
+        <div class="seccion-titulo">RESUMEN DE INVENTARIO</div>
+
+        <table>
+            <tr>
+                <th>Descripción</th>
+                <th>Cantidad Retirada</th>
+                <th>Unidad</th>
+            </tr>
+
+            <tr>
+                <td>{{ movimiento.producto.nombre if movimiento.producto else '' }}</td>
+                <td>
+                    {{ "{:,.2f}".format(movimiento.cantidad).replace(",", "X").replace(".", ",").replace("X", ".") }}
+                </td>
+                <td>{{ movimiento.producto.unidad if movimiento.producto else '' }}</td>
+            </tr>
+        </table>
+    </div>
+
     <div class="nota">
-        Este documento es un comprobante de ingreso de material al inventario.
+        Este documento es un comprobante de salida de material del inventario.
         Conserve este recibo para control y respaldo de la operación.
     </div>
 
@@ -417,13 +373,8 @@ td:first-child{
     </div>
 
     <div class="acciones">
-        <button onclick="window.print()" class="btn">
-            🖨 Imprimir recibo
-        </button>
-
-        <a href="/productos" class="btn">
-            Volver a productos
-        </a>
+        <button onclick="window.print()" class="btn">🖨 Imprimir recibo</button>
+        <a href="/movimientos" class="btn">Volver a salidas</a>
     </div>
 
 </div>
