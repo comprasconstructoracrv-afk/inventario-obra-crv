@@ -228,15 +228,3 @@ def eliminar_producto(id):
     db.session.commit()
 
     return redirect(url_for("productos.listar_productos"))
-
-@productos_bp.route("/productos/limpiar-pruebas")
-@login_required
-def limpiar_pruebas():
-
-    Movimiento.query.delete()
-    Existencia.query.delete()
-    Producto.query.delete()
-
-    db.session.commit()
-
-    return redirect(url_for("productos.listar_productos"))
