@@ -9,6 +9,7 @@ from models.destino import Destino
 from models.existencia import Existencia
 import json
 from flask import render_template, request, redirect, url_for
+from utils.permisos import solo_admin
 
 movimientos_bp = Blueprint("movimientos", __name__)
 
@@ -167,6 +168,7 @@ def nuevo_movimiento():
 
 @movimientos_bp.route("/movimientos/editar/<int:id>", methods=["GET", "POST"])
 @login_required
+@solo_admin
 def editar_movimiento(id):
     movimiento = Movimiento.query.get_or_404(id)
     productos = Producto.query.order_by(Producto.nombre.asc()).all()
@@ -209,6 +211,7 @@ def editar_movimiento(id):
 
 @movimientos_bp.route("/movimientos/eliminar/<int:id>")
 @login_required
+@solo_admin
 def eliminar_movimiento(id):
     movimiento = Movimiento.query.get_or_404(id)
 

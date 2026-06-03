@@ -3,6 +3,7 @@ from flask_login import login_required
 
 from extensions import db
 from models.destino import Destino
+from utils.permisos import solo_admin
 
 
 destinos_bp = Blueprint("destinos", __name__)
@@ -49,6 +50,7 @@ def nuevo_destino():
 
 @destinos_bp.route("/destinos/editar/<int:id>", methods=["GET", "POST"])
 @login_required
+@solo_admin
 def editar_destino(id):
     destino = Destino.query.get_or_404(id)
 
@@ -67,6 +69,7 @@ def editar_destino(id):
 
 @destinos_bp.route("/destinos/eliminar/<int:id>")
 @login_required
+@solo_admin
 def eliminar_destino(id):
     destino = Destino.query.get_or_404(id)
     destino.estado = "INACTIVO"

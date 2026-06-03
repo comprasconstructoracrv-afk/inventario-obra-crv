@@ -8,6 +8,7 @@ from models.existencia import Existencia
 from models.movimiento import Movimiento
 from extensions import db
 from flask import redirect, url_for
+from utils.permisos import solo_admin
 
 productos_bp = Blueprint("productos", __name__)
 
@@ -197,6 +198,7 @@ def recibo_ingreso(movimiento_id):
 
 @productos_bp.route("/productos/editar/<int:id>", methods=["GET", "POST"])
 @login_required
+@solo_admin
 def editar_producto(id):
     producto = Producto.query.get_or_404(id)
 
@@ -214,6 +216,7 @@ def editar_producto(id):
 
 @productos_bp.route("/productos/eliminar/<int:id>")
 @login_required
+@solo_admin
 def eliminar_producto(id):
     producto = Producto.query.get_or_404(id)
 

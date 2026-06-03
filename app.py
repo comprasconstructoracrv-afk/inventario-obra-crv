@@ -101,6 +101,23 @@ def crear_app():
 
         admin = Usuario.query.filter_by(usuario="admin").first()
 
+        almacenista = Usuario.query.filter_by(
+            usuario="almacen"
+        ).first()
+
+        if not almacenista:
+
+            almacenista = Usuario(
+                nombre="ALMACENISTA",
+                usuario="almacen",
+                rol="ALMACENISTA"
+            )
+
+            almacenista.set_password("1234")
+
+            db.session.add(almacenista)
+            db.session.commit()
+
         destinos_iniciales = [
             ("Casa 11 Tamarindo", "TAMARINDO"),
             ("Casa 12 Tamarindo", "TAMARINDO"),

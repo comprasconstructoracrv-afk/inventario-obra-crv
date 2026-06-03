@@ -7,6 +7,7 @@ from io import BytesIO
 from openpyxl import Workbook
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from utils.permisos import solo_admin
 
 obras_bp = Blueprint("obras", __name__)
 
@@ -70,6 +71,7 @@ def nueva_obra():
 
 @obras_bp.route("/obras/editar/<int:id>", methods=["GET", "POST"])
 @login_required
+@solo_admin
 def editar_obra(id):
     obra = Obra.query.get_or_404(id)
 
@@ -86,6 +88,7 @@ def editar_obra(id):
 
 @obras_bp.route("/obras/eliminar/<int:id>")
 @login_required
+@solo_admin
 def eliminar_obra(id):
     obra = Obra.query.get_or_404(id)
     db.session.delete(obra)
