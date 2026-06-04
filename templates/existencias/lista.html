@@ -36,7 +36,7 @@
             <td>{{ e.producto.unidad }}</td>
 
             <td>
-                {% if e.producto.unidad|upper == "UNIDADES" %}
+                {% if resumen[e.id].ingresos == resumen[e.id].ingresos|int %}
                     {{ resumen[e.id].ingresos|int }}
                 {% else %}
                     {{ "{:,.2f}".format(resumen[e.id].ingresos).replace(",", "X").replace(".", ",").replace("X", ".") }}
@@ -45,7 +45,7 @@
             </td>
 
             <td>
-                {% if e.producto.unidad|upper == "UNIDADES" %}
+                {% if resumen[e.id].salidas == resumen[e.id].salidas|int %}
                     {{ resumen[e.id].salidas|int }}
                 {% else %}
                     {{ "{:,.2f}".format(resumen[e.id].salidas).replace(",", "X").replace(".", ",").replace("X", ".") }}
@@ -55,7 +55,7 @@
 
             <td>
                 <strong>
-                    {% if e.producto.unidad|upper == "UNIDADES" %}
+                    {% if resumen[e.id].disponible == resumen[e.id].disponible|int %}
                         {{ resumen[e.id].disponible|int }}
                     {% else %}
                         {{ "{:,.2f}".format(resumen[e.id].disponible).replace(",", "X").replace(".", ",").replace("X", ".") }}
