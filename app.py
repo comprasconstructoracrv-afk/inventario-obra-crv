@@ -154,7 +154,7 @@ def crear_app():
                 rol="ADMIN"
             )
 
-            admin.set_password("1234")
+            admin.set_password("2314")
 
             db.session.add(admin)
 

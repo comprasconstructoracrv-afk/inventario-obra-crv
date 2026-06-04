@@ -48,12 +48,14 @@
         </div>
 
         <div class="bodega-actions no-print">
-            <a class="btn btn-small btn-edit" href="/obras/editar/{{ item.obra.id }}">✏️ Editar</a>
+            {% if current_user.rol == "ADMIN" %}
+            <a class="btn btn-small btn-edit" href="/obras/editar/{{ item.obra.id }}">Editar</a>
             <a href="/obras/eliminar/{{ item.obra.id }}"
             class="btn btn-small btn-danger"
             onclick="return confirm('¿Desea eliminar la bodega {{ item.obra.nombre }}?')">
-                🗑 Eliminar
+                Eliminar
             </a>
+            {% endif %}
         </div>
 
     </div>

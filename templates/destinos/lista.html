@@ -63,6 +63,8 @@
 
             <td class="text-center">
 
+                {% if current_user.rol == "ADMIN" %}
+
                 <a class="btn btn-small btn-edit"
                    href="/destinos/editar/{{ d.id }}">
 
@@ -75,6 +77,7 @@
                 onclick="return confirm('¿Desea eliminar el destino {{ d.nombre }}?')">
                     Eliminar
                 </a>
+                {% endif %}
             </td>
 
         </tr>
