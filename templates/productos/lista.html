@@ -104,7 +104,11 @@
             <td>{{ p.unidad }}</td>
 
             <td>
-                {{ "{:,.2f}".format(p.stock).replace(",", "X").replace(".", ",").replace("X", ".") }}
+                {% if p.stock == p.stock|int %}
+                    {{ p.stock|int }}
+                {% else %}
+                    {{ "{:,.2f}".format(p.stock).replace(",", "X").replace(".", ",").replace("X", ".") }}
+                {% endif %}
             </td>
 
             <td>
