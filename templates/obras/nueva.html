@@ -171,7 +171,7 @@
 
 </div>
 
-<form method="POST">
+<form method="POST" action="{{ url_for('obras.nueva_obra') }}">
 
     <div class="producto-grid">
 
@@ -247,14 +247,14 @@
             </div>
 
             <div class="alerta-info">
-                🏢 La bodega quedará disponible
+                La bodega quedará disponible
                 inmediatamente en el sistema.
             </div>
 
             <div class="acciones-formulario">
 
                 <button type="submit" class="btn-guardar">
-                    💾 Guardar Bodega
+                    Guardar Bodega
                 </button>
 
                 <a href="{{ url_for('obras.listar_obras') }}" class="btn-cancelar">
