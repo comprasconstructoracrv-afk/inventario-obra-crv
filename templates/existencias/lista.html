@@ -36,18 +36,30 @@
             <td>{{ e.producto.unidad }}</td>
 
             <td>
-                {{ "{:,.2f}".format(resumen[e.id].ingresos).replace(",", "X").replace(".", ",").replace("X", ".") }}
+                {% if e.producto.unidad|upper == "UNIDADES" %}
+                    {{ resumen[e.id].ingresos|int }}
+                {% else %}
+                    {{ "{:,.2f}".format(resumen[e.id].ingresos).replace(",", "X").replace(".", ",").replace("X", ".") }}
+                {% endif %}
                 {{ e.producto.unidad }}
             </td>
 
             <td>
-                {{ "{:,.2f}".format(resumen[e.id].salidas).replace(",", "X").replace(".", ",").replace("X", ".") }}
+                {% if e.producto.unidad|upper == "UNIDADES" %}
+                    {{ resumen[e.id].salidas|int }}
+                {% else %}
+                    {{ "{:,.2f}".format(resumen[e.id].salidas).replace(",", "X").replace(".", ",").replace("X", ".") }}
+                {% endif %}
                 {{ e.producto.unidad }}
             </td>
 
             <td>
                 <strong>
-                    {{ "{:,.2f}".format(resumen[e.id].disponible).replace(",", "X").replace(".", ",").replace("X", ".") }}
+                    {% if e.producto.unidad|upper == "UNIDADES" %}
+                        {{ resumen[e.id].disponible|int }}
+                    {% else %}
+                        {{ "{:,.2f}".format(resumen[e.id].disponible).replace(",", "X").replace(".", ",").replace("X", ".") }}
+                    {% endif %}
                     {{ e.producto.unidad }}
                 </strong>
             </td>

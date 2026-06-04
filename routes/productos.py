@@ -109,11 +109,16 @@ def nuevo_producto():
         obra_id = int(request.form["obra_id"])
         cantidad = float(request.form["cantidad"])
 
+        unidad = request.form["unidad"].upper()
+
+        if unidad == "OTRO":
+            unidad = request.form["unidad_personalizada"].upper()
+
         producto = Producto(
             codigo=request.form["codigo"],
             nombre=nombre,
             categoria=request.form["categoria"].upper(),
-            unidad=request.form["unidad"].upper(),
+            unidad=unidad,
             stock=cantidad,
             stock_minimo=0,
             activo=True

@@ -300,6 +300,12 @@
                         <option value="LIBRA">LIBRA</option>
                         <option value="OTRO">OTRO</option>
                     </select>
+                    <input
+                        type="text"
+                        id="unidad_personalizada"
+                        name="unidad_personalizada"
+                        placeholder="Escriba la unidad (Ej: ROLLOS)"
+                        style="display:none; margin-top:10px;">
                 </div>
 
                 <div class="form-group">
@@ -333,5 +339,25 @@
     </div>
 
 </form>
+<script>
+document.addEventListener("DOMContentLoaded", function(){
 
+    const unidad = document.querySelector('select[name="unidad"]');
+    const personalizada = document.getElementById("unidad_personalizada");
+
+    function controlarUnidad(){
+        if(unidad.value === "OTRO"){
+            personalizada.style.display = "block";
+            personalizada.required = true;
+        }else{
+            personalizada.style.display = "none";
+            personalizada.required = false;
+            personalizada.value = "";
+        }
+    }
+
+    unidad.addEventListener("change", controlarUnidad);
+    controlarUnidad();
+});
+</script>
 {% endblock %}
