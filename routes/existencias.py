@@ -6,7 +6,7 @@ from models.movimiento import Movimiento
 from models.obra import Obra
 from io import BytesIO
 from openpyxl import Workbook
-from reportlab.lib.pagesizes import letter
+from reportlab.lib.pagesizes import letter, landscape
 from reportlab.pdfgen import canvas
 
 existencias_bp = Blueprint("existencias", __name__)
@@ -148,31 +148,39 @@ def exportar_existencias_pdf():
     existencias, resumen = obtener_resumen_existencias()
 
     archivo = BytesIO()
-    pdf = canvas.Canvas(archivo, pagesize=letter)
+    pdf = canvas.Canvas(archivo, pagesize=landscape(letter))
 
-    width, height = letter
-    y = height - 50
+    width, height = landscape(letter)
+    y = height - 45
 
-    pdf.setFont("Helvetica-Bold", 14)
-    pdf.drawString(50, y, "REPORTE GENERAL DE INVENTARIO")
-    y -= 30
+    def encabezado():
+        nonlocal y
+        y = height - 45
+        pdf.setFont("Helvetica-Bold", 14)
+        pdf.drawString(30, y, "REPORTE GENERAL DE INVENTARIO")
+        y -= 25
 
-    pdf.setFont("Helvetica-Bold", 8)
-    pdf.drawString(40, y, "Producto")
-    pdf.drawString(160, y, "Unidad")
-    pdf.drawString(230, y, "Bodega")
-    pdf.drawString(320, y, "Ingresos")
-    pdf.drawString(380, y, "Salidas")
-    pdf.drawString(440, y, "Disponible")
-    pdf.drawString(520, y, "Estado")
-    y -= 15
+        pdf.setFont("Helvetica-Bold", 8)
+        pdf.drawString(30, y, "Producto")
+        pdf.drawString(270, y, "Unidad")
+        pdf.drawString(350, y, "Bodega")
+        pdf.drawString(450, y, "Ingresos")
+        pdf.drawString(530, y, "Salidas")
+        pdf.drawString(610, y, "Disponible")
+        pdf.drawString(710, y, "Estado")
+        y -= 12
 
-    pdf.setFont("Helvetica", 8)
+        pdf.line(30, y, 770, y)
+        y -= 12
+
+    encabezado()
+    pdf.setFont("Helvetica", 7)
 
     for e in existencias:
-        if y < 60:
+        if y < 45:
             pdf.showPage()
-            y = height - 50
+            encabezado()
+            pdf.setFont("Helvetica", 7)
 
         disponible = resumen[e.id]["disponible"]
 
@@ -183,14 +191,14 @@ def exportar_existencias_pdf():
         else:
             estado = "DISPONIBLE"
 
-        pdf.drawString(40, y, str(e.producto.nombre)[:18])
-        pdf.drawString(160, y, str(e.producto.unidad)[:10])
-        pdf.drawString(230, y, str(e.obra.nombre)[:15])
-        pdf.drawString(320, y, str(resumen[e.id]["ingresos"]))
-        pdf.drawString(380, y, str(resumen[e.id]["salidas"]))
-        pdf.drawString(440, y, str(disponible))
-        pdf.drawString(520, y, estado)
-        y -= 15
+        pdf.drawString(30, y, str(e.producto.nombre)[:42])
+        pdf.drawString(270, y, str(e.producto.unidad)[:12])
+        pdf.drawString(350, y, str(e.obra.nombre)[:16])
+        pdf.drawString(450, y, str(resumen[e.id]["ingresos"]))
+        pdf.drawString(530, y, str(resumen[e.id]["salidas"]))
+        pdf.drawString(610, y, str(disponible))
+        pdf.drawString(710, y, estado)
+        y -= 12
 
     pdf.save()
     archivo.seek(0)
@@ -254,30 +262,38 @@ def exportar_bodega_pdf(obra_id):
     existencias, resumen = obtener_resumen_existencias(obra_id)
 
     archivo = BytesIO()
-    pdf = canvas.Canvas(archivo, pagesize=letter)
+    pdf = canvas.Canvas(archivo, pagesize=landscape(letter))
 
-    width, height = letter
-    y = height - 50
+    width, height = landscape(letter)
+    y = height - 45
 
-    pdf.setFont("Helvetica-Bold", 14)
-    pdf.drawString(50, y, f"INVENTARIO - {bodega.nombre}")
-    y -= 30
+    def encabezado():
+        nonlocal y
+        y = height - 45
+        pdf.setFont("Helvetica-Bold", 14)
+        pdf.drawString(30, y, f"INVENTARIO - {bodega.nombre}")
+        y -= 25
 
-    pdf.setFont("Helvetica-Bold", 8)
-    pdf.drawString(40, y, "Producto")
-    pdf.drawString(170, y, "Unidad")
-    pdf.drawString(240, y, "Ingresos")
-    pdf.drawString(320, y, "Salidas")
-    pdf.drawString(400, y, "Disponible")
-    pdf.drawString(500, y, "Estado")
-    y -= 15
+        pdf.setFont("Helvetica-Bold", 8)
+        pdf.drawString(30, y, "Producto")
+        pdf.drawString(300, y, "Unidad")
+        pdf.drawString(400, y, "Ingresos")
+        pdf.drawString(500, y, "Salidas")
+        pdf.drawString(600, y, "Disponible")
+        pdf.drawString(710, y, "Estado")
+        y -= 12
 
-    pdf.setFont("Helvetica", 8)
+        pdf.line(30, y, 770, y)
+        y -= 12
+
+    encabezado()
+    pdf.setFont("Helvetica", 7)
 
     for e in existencias:
-        if y < 60:
+        if y < 45:
             pdf.showPage()
-            y = height - 50
+            encabezado()
+            pdf.setFont("Helvetica", 7)
 
         disponible = resumen[e.id]["disponible"]
 
@@ -288,13 +304,13 @@ def exportar_bodega_pdf(obra_id):
         else:
             estado = "DISPONIBLE"
 
-        pdf.drawString(40, y, str(e.producto.nombre)[:20])
-        pdf.drawString(170, y, str(e.producto.unidad)[:12])
-        pdf.drawString(240, y, str(resumen[e.id]["ingresos"]))
-        pdf.drawString(320, y, str(resumen[e.id]["salidas"]))
-        pdf.drawString(400, y, str(disponible))
-        pdf.drawString(500, y, estado)
-        y -= 15
+        pdf.drawString(30, y, str(e.producto.nombre)[:48])
+        pdf.drawString(300, y, str(e.producto.unidad)[:14])
+        pdf.drawString(400, y, str(resumen[e.id]["ingresos"]))
+        pdf.drawString(500, y, str(resumen[e.id]["salidas"]))
+        pdf.drawString(600, y, str(disponible))
+        pdf.drawString(710, y, estado)
+        y -= 12
 
     pdf.save()
     archivo.seek(0)

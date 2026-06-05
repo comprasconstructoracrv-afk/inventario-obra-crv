@@ -153,7 +153,7 @@
         <div class="form-group">
             <label>Producto</label>
 
-            <select name="producto_id" required>
+            <select name="producto_id" id="producto_id" required>
                 <option value="">Seleccione un producto</option>
 
                 {% for p in productos %}
@@ -169,19 +169,15 @@
             <div class="form-group">
                 <label>Bodega origen</label>
 
-                <select name="origen_id" required>
-                    <option value="">Seleccione bodega origen</option>
-
-                    {% for b in bodegas %}
-                        <option value="{{ b.id }}">{{ b.nombre }}</option>
-                    {% endfor %}
+                <select name="bodega_origen_id" id="bodega_origen_id" required>
+                    <option value="">Seleccione producto primero</option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label>Bodega destino</label>
 
-                <select name="destino_id" required>
+                <select name="bodega_destino_id" id="bodega_destino_id" required>
                     <option value="">Seleccione bodega destino</option>
 
                     {% for b in bodegas %}
@@ -233,5 +229,45 @@
     </div>
 
 </form>
+
+<script>
+const existencias = [
+{% for e in existencias %}
+    {% if e.obra and e.cantidad > 0 %}
+    {
+        producto_id: {{ e.producto_id }},
+        bodega_id: {{ e.obra_id }},
+        bodega_nombre: {{ e.obra.nombre|tojson }},
+        cantidad: {{ e.cantidad }}
+    },
+    {% endif %}
+{% endfor %}
+];
+
+document.addEventListener("DOMContentLoaded", function() {
+    const productoSelect = document.getElementById("producto_id");
+    const origenSelect = document.getElementById("bodega_origen_id");
+
+    productoSelect.addEventListener("change", function() {
+        const productoId = parseInt(this.value);
+
+        origenSelect.innerHTML = "";
+
+        const opcionInicial = document.createElement("option");
+        opcionInicial.value = "";
+        opcionInicial.textContent = "Seleccione bodega origen";
+        origenSelect.appendChild(opcionInicial);
+
+        existencias.forEach(function(item) {
+            if (item.producto_id === productoId && item.cantidad > 0) {
+                const option = document.createElement("option");
+                option.value = item.bodega_id;
+                option.textContent = item.bodega_nombre + " (Disponible: " + item.cantidad + ")";
+                origenSelect.appendChild(option);
+            }
+        });
+    });
+});
+</script>
 
 {% endblock %}

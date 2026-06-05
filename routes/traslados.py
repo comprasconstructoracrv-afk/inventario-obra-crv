@@ -30,8 +30,9 @@ def obtener_existencia(producto_id, obra_id):
 @traslados_bp.route("/traslados/nuevo", methods=["GET", "POST"])
 @login_required
 def nuevo_traslado():
-    productos = Producto.query.all()
-    bodegas = Obra.query.all()
+    productos = Producto.query.order_by(Producto.nombre.asc()).all()
+    bodegas = Obra.query.order_by(Obra.nombre.asc()).all()
+    existencias = Existencia.query.all()
 
     if request.method == "POST":
         producto_id = int(request.form["producto_id"])
@@ -57,7 +58,7 @@ def nuevo_traslado():
             obra_id=bodega_origen_id,
             tipo="SALIDA",
             cantidad=cantidad,
-            observacion=f"TRASLADO A BODEGA DESTINO. {observacion}"
+            observaciones=f"TRASLADO A BODEGA DESTINO. {observacion}"
         )
 
         ingreso = Movimiento(
@@ -65,7 +66,7 @@ def nuevo_traslado():
             obra_id=bodega_destino_id,
             tipo="INGRESO",
             cantidad=cantidad,
-            observacion=f"TRASLADO DESDE BODEGA ORIGEN. {observacion}"
+            observaciones=f"TRASLADO DESDE BODEGA ORIGEN. {observacion}"
         )
 
         db.session.add(salida)
@@ -77,5 +78,6 @@ def nuevo_traslado():
     return render_template(
         "traslados/nuevo.html",
         productos=productos,
-        bodegas=bodegas
+        bodegas=bodegas,
+        existencias=existencias
     )
