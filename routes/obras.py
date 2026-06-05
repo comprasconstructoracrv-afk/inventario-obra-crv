@@ -8,6 +8,7 @@ from openpyxl import Workbook
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from utils.permisos import solo_admin
+from models.movimiento import Movimiento
 
 obras_bp = Blueprint("obras", __name__)
 
@@ -91,8 +92,13 @@ def editar_obra(id):
 @solo_admin
 def eliminar_obra(id):
     obra = Obra.query.get_or_404(id)
+
+    Movimiento.query.filter_by(obra_id=obra.id).delete()
+    Existencia.query.filter_by(obra_id=obra.id).delete()
+
     db.session.delete(obra)
     db.session.commit()
+
     return redirect(url_for("obras.listar_obras"))
 
 
