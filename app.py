@@ -166,8 +166,8 @@ def crear_app():
             ("productos", "tipo_producto", "VARCHAR(50) DEFAULT 'OBRA'"),
             ("obras", "empresa_id", "INTEGER REFERENCES empresa(id)"),
             ("productos", "empresa_id", "INTEGER REFERENCES empresa(id)"),
-            ("destino", "empresa_id", "INTEGER REFERENCES empresa(id)"),
-            ("usuario", "empresa_id", "INTEGER REFERENCES empresa(id)"),
+            ("destinos", "empresa_id", "INTEGER REFERENCES empresa(id)"),
+            ("usuarios", "empresa_id", "INTEGER REFERENCES empresa(id)"),
         ]
 
         for tabla, columna, tipo in columnas_a_agregar:
@@ -220,8 +220,8 @@ def crear_app():
         try:
             db.session.execute(text(f"UPDATE obras SET empresa_id = {empresa_principal.id} WHERE empresa_id IS NULL OR empresa_id = 0;"))
             db.session.execute(text(f"UPDATE productos SET empresa_id = {empresa_principal.id} WHERE empresa_id IS NULL OR empresa_id = 0;"))
-            db.session.execute(text(f"UPDATE destino SET empresa_id = {empresa_principal.id} WHERE empresa_id IS NULL OR empresa_id = 0;"))
-            db.session.execute(text(f"UPDATE usuario SET empresa_id = {empresa_principal.id} WHERE empresa_id IS NULL OR empresa_id = 0;"))
+            db.session.execute(text(f"UPDATE destinos SET empresa_id = {empresa_principal.id} WHERE empresa_id IS NULL OR empresa_id = 0;"))
+            db.session.execute(text(f"UPDATE usuarios SET empresa_id = {empresa_principal.id} WHERE empresa_id IS NULL OR empresa_id = 0;"))
             db.session.execute(text("UPDATE productos SET tipo_producto = 'OBRA' WHERE tipo_producto IS NULL;"))
             db.session.commit()
         except Exception:
