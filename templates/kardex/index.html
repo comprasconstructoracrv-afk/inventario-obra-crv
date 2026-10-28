@@ -185,13 +185,19 @@
 }
 </style>
 
+<div class="header-actions no-print">
+    <button onclick="window.history.back()" class="btn btn-dark">
+        Volver
+    </button>
+</div>
+
 <div class="historial-page-title">
 
     <div class="icono">📚</div>
 
     <div>
         <h1>Historial por Producto</h1>
-        <p>Consulta ingresos, salidas, bodegas, destinos y movimientos del material.</p>
+        <p>Consulta ingresos, salidas, sedes, bodegas, destinos y movimientos de los productos.</p>
     </div>
 
 </div>
@@ -278,9 +284,10 @@
         <tr>
             <th>Fecha</th>
             <th>Tipo</th>
-            <th>Bodega</th>
+            <th>Sede/ Bodega</th>
             <th>Destino</th>
             <th>Cantidad</th>
+            <th>Responsable</th>
             <th>Observaciones</th>
         </tr>
 
@@ -296,7 +303,7 @@
                 {% endif %}
             </td>
 
-            <td>{{ m.obra.nombre if m.obra else "-" }}</td>
+            <td>{{ m.obra.nombre if m.obra else "-" }} - {{ m.obra.ubicacion if m.obra else "-" }}</td>
 
             <td>
                 {% if m.destino %}
@@ -309,6 +316,8 @@
             <td>
                 {{ "{:,.2f}".format(m.cantidad).replace(",", "X").replace(".", ",").replace("X", ".") }}
             </td>
+
+             <td>{{ m.responsable or "" }}</td>
 
             <td>{{ m.observaciones or "" }}</td>
         </tr>

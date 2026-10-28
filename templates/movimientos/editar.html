@@ -23,7 +23,7 @@
 
             <div class="form-group">
                 <label>Producto</label>
-                <select name="producto_id" required>
+                <select name="producto_id" id="producto_id" required>
                     {% for producto in productos %}
                     <option value="{{ producto.id }}"
                         {% if movimiento.producto_id == producto.id %}selected{% endif %}>
@@ -34,13 +34,13 @@
             </div>
 
             <div class="form-group">
-                <label>Bodega</label>
-                <select name="obra_id" required>
-                    {% for obra in obras %}
-                    <option value="{{ obra.id }}"
-                        {% if movimiento.obra_id == obra.id %}selected{% endif %}>
-                        {{ obra.nombre }}
-                    </option>
+                <label>Bodega/Sede de Origen</label>
+                <select name="obra_id" id="obra_id" class="form-control" data-bodega-actual="{{ movimiento.obra_id }}" required>
+                    <option value="">Seleccione una bodega</option>
+                    {% for b in bodegas %}
+                        <option value="{{ b.id }}" data-nombre="{{ b.nombre }}" {% if movimiento.obra_id == b.id %}selected{% endif %}>
+                            {{ b.nombre }}
+                        </option>
                     {% endfor %}
                 </select>
             </div>
@@ -49,14 +49,14 @@
 
         <div class="form-grid">
 
-            <div class="form-group">
-                <label>Destino del material</label>
-                <select name="destino_id" required>
-                    {% for destino in destinos %}
-                    <option value="{{ destino.id }}"
-                        {% if movimiento.destino_id == destino.id %}selected{% endif %}>
-                        {{ destino.nombre }}
-                    </option>
+           <div class="form-group">
+                <label>Destino</label>
+                <select name="destino_id" class="form-control" required>
+                    <option value="">Seleccione un destino</option>
+                    {% for d in destinos %}
+                        <option value="{{ d.id }}" {% if movimiento.destino_id == d.id %}selected{% endif %}>
+                            {{ d.nombre }}
+                        </option>
                     {% endfor %}
                 </select>
             </div>
@@ -80,7 +80,7 @@
         </div>
 
         <div class="alerta-info">
-            📌 Al guardar cambios, verifique que la salida corresponda a la bodega y destino correctos.
+            📌 Al guardar cambios, verifique que la salida corresponda a la sede/ bodega y destino correctos.
         </div>
 
         <div class="acciones-formulario">
@@ -208,5 +208,61 @@
     text-decoration:none;
 }
 </style>
+
+<script>
+    const existenciasData = JSON.parse('{{ existencias_json | safe }}');
+
+    const productoSelect = document.getElementById("producto_id");
+    const bodegaSelect = document.getElementById("obra_id");
+    const bodegaActual = bodegaSelect.getAttribute("data-bodega-actual");
+
+    // Guardar las opciones originales de bodegas
+    const opcionesBodegas = Array.from(bodegaSelect.querySelectorAll("option")).filter(opt => opt.value !== "");
+
+    function actualizarBodegas(bodegaSeleccionadaPreviamente) {
+        const productoId = productoSelect.value;
+        bodegaSelect.innerHTML = "";
+
+        if (!productoId || !existenciasData[productoId]) {
+            const defaultOpt = document.createElement("option");
+            defaultOpt.value = "";
+            defaultOpt.textContent = "Seleccione una bodega";
+            bodegaSelect.appendChild(defaultOpt);
+            return;
+        }
+
+        const bodegasDisponibles = existenciasData[productoId];
+
+        const defaultOpt = document.createElement("option");
+        defaultOpt.value = "";
+        defaultOpt.textContent = "Seleccione una bodega";
+        bodegaSelect.appendChild(defaultOpt);
+
+        bodegasDisponibles.forEach(item => {
+            const optOriginal = opcionesBodegas.find(o => o.value == item.obra_id);
+            if (optOriginal) {
+                const newOpt = document.createElement("option");
+                newOpt.value = item.obra_id;
+
+                let cantFormateada = Number.isInteger(item.cantidad) ? item.cantidad : item.cantidad.toString().replace('.', ',');
+                newOpt.textContent = `${optOriginal.getAttribute("data-nombre")} (Disponible: ${cantFormateada})`;
+
+                if (bodegaSeleccionadaPreviamente && item.obra_id == bodegaSeleccionadaPreviamente) {
+                    newOpt.selected = true;
+                }
+
+                bodegaSelect.appendChild(newOpt);
+            }
+        });
+    }
+
+    // Cargar bodegas al iniciar la vista
+    actualizarBodegas(bodegaActual);
+
+    // Escuchar cambios al seleccionar otro producto
+    productoSelect.addEventListener("change", function () {
+        actualizarBodegas(null);
+    });
+</script>
 
 {% endblock %}

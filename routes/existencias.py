@@ -1,28 +1,38 @@
-from flask import Blueprint, render_template, send_file
+from io import BytesIO
+from flask import Blueprint, render_template, request, send_file, session
 from flask_login import login_required
 from sqlalchemy import func
-from models.existencia import Existencia
-from models.movimiento import Movimiento
-from models.obra import Obra
-from io import BytesIO
 from openpyxl import Workbook
 from reportlab.lib.pagesizes import letter, landscape
 from reportlab.pdfgen import canvas
 
+from models.existencia import Existencia
+from models.movimiento import Movimiento
+from models.obra import Obra
+from models.producto import Producto
+
 existencias_bp = Blueprint("existencias", __name__)
 
+
 def obtener_resumen_existencias(obra_id=None):
+    empresa_id = session.get("empresa_id")
     query = Existencia.query
 
     if obra_id:
         query = query.filter_by(obra_id=obra_id)
+    elif empresa_id:
+        bodegas = Obra.query.filter_by(empresa_id=empresa_id).all()
+        bodega_ids = [b.id for b in bodegas]
+        if bodega_ids:
+            query = query.filter(Existencia.obra_id.in_(bodega_ids))
+        else:
+            return [], {}
 
     existencias = query.all()
     resumen = {}
     existencias_validas = []
 
     for e in existencias:
-
         if not e.producto:
             continue
 
@@ -56,7 +66,12 @@ def obtener_resumen_existencias(obra_id=None):
 @existencias_bp.route("/existencias")
 @login_required
 def listar_bodegas_inventario():
-    bodegas = Obra.query.order_by(Obra.nombre.asc()).all()
+    empresa_id = session.get("empresa_id")
+
+    if empresa_id:
+        bodegas = Obra.query.filter_by(empresa_id=empresa_id).order_by(Obra.nombre.asc()).all()
+    else:
+        bodegas = Obra.query.order_by(Obra.nombre.asc()).all()
 
     bodegas_data = []
 
@@ -87,13 +102,51 @@ def listar_bodegas_inventario():
 @login_required
 def inventario_por_bodega(obra_id):
     bodega = Obra.query.get_or_404(obra_id)
-    existencias, resumen = obtener_resumen_existencias(obra_id)
+    tipo_filtro = request.args.get("tipo", "TODOS").upper()
+    existencias_todas, resumen = obtener_resumen_existencias(obra_id)
+
+    # 2. Conteo total
+    conteo_todos = len(existencias_todas)
+    tipos_conteo = {}
+
+    for e in existencias_todas:
+        if e.producto:
+            tipo = (getattr(e.producto, "tipo_producto", "OBRA") or "OBRA").upper()
+            tipos_conteo[tipo] = tipos_conteo.get(tipo, 0) + 1
+
+    iconos_map = {
+        "OBRA": "🏗️",
+        "BICICLETA": "🚲",
+        "REPUESTO": "⚙️"
+    }
+
+    categorias_cards = []
+    for tipo_nombre, cantidad in tipos_conteo.items():
+        icono = iconos_map.get(tipo_nombre, "📦")
+        categorias_cards.append({
+            "codigo": tipo_nombre,
+            "nombre": tipo_nombre.capitalize(),
+            "icono": icono,
+            "cantidad": cantidad
+        })
+
+    # 4. Filtrar lista según el tipo_producto seleccionado
+    if tipo_filtro != "TODOS":
+        existencias = [
+            e for e in existencias_todas
+            if e.producto and (getattr(e.producto, "tipo_producto", "OBRA") or "OBRA").upper() == tipo_filtro
+        ]
+    else:
+        existencias = existencias_todas
 
     return render_template(
         "existencias/lista.html",
         bodega=bodega,
         existencias=existencias,
-        resumen=resumen
+        resumen=resumen,
+        tipo_filtro=tipo_filtro,
+        conteo_todos=conteo_todos,
+        categorias_cards=categorias_cards
     )
 
 
@@ -209,6 +262,7 @@ def exportar_existencias_pdf():
         download_name="inventario_general.pdf",
         mimetype="application/pdf"
     )
+
 
 @existencias_bp.route("/existencias/bodega/<int:obra_id>/excel")
 @login_required

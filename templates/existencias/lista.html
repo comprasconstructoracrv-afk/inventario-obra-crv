@@ -2,6 +2,77 @@
 
 {% block content %}
 
+<style>
+    /* TARJETAS/CAJAS SUPERIORES DE CATEGORÍAS */
+    .categorias-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 18px;
+        margin-bottom: 24px;
+    }
+
+    .card-categoria {
+        background: white;
+        border-radius: 18px;
+        padding: 20px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+        text-decoration: none;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        border: 2px solid transparent;
+        transition: all 0.25s ease;
+    }
+
+    .card-categoria:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-categoria.activa {
+        border-color: #2563eb;
+        background: #f0f6ff;
+    }
+
+    .card-categoria .icono-cat {
+        width: 50px;
+        height: 50px;
+        border-radius: 14px;
+        background: #e0f2fe;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    .card-categoria .info-cat strong {
+        display: block;
+        font-size: 16px;
+        color: #0f172a;
+    }
+
+    .card-categoria .info-cat span {
+        font-size: 13px;
+        color: #64748b;
+    }
+
+    .card-categoria .count-badge {
+        margin-left: auto;
+        background: #0f172a;
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+        padding: 4px 10px;
+        border-radius: 999px;
+    }
+
+    .card-categoria.activa .count-badge {
+        background: #2563eb;
+    }
+</style>
+
 <div class="header-actions no-print">
     <div class="left-actions">
         <button onclick="window.history.back()" class="btn btn-dark">Volver</button>
@@ -19,10 +90,39 @@
     <p>Disponibilidad real de materiales en esta bodega.</p>
 </div>
 
+<!-- TARJETAS DE CATEGORÍA BASADAS EN EL ATRIBUTO TIPO_PRODUCTO DE LA BODEGA -->
+<div class="categorias-grid no-print">
+    <!-- Opción para ver "Todos" -->
+    <a href="/existencias/bodega/{{ bodega.id }}?tipo=TODOS" 
+       class="card-categoria {% if tipo_filtro == 'TODOS' %}activa{% endif %}">
+        <div class="icono-cat">📦</div>
+        <div class="info-cat">
+            <strong>Todos</strong>
+            <span>Catálogo completo</span>
+        </div>
+        <div class="count-badge">{{ conteo_todos }}</div>
+    </a>
+
+    <!-- Tarjetas dinámicas generadas según los tipos de productos en esta bodega -->
+    {% for cat in categorias_cards %}
+    <a href="/existencias/bodega/{{ bodega.id }}?tipo={{ cat.codigo }}" 
+       class="card-categoria {% if tipo_filtro == cat.codigo %}activa{% endif %}">
+        <div class="icono-cat">{{ cat.icono }}</div>
+        <div class="info-cat">
+            <strong>{{ cat.nombre }}</strong>
+            <span>Categoría {{ cat.nombre }}</span>
+        </div>
+        <div class="count-badge">{{ cat.cantidad }}</div>
+    </a>
+    {% endfor %}
+</div>
+
+<!-- TABLA DE PRODUCTOS EN LA BODEGA -->
 <div class="table-card">
     <table>
         <tr>
             <th>Producto</th>
+            <th>Tipo</th>
             <th>Unidad</th>
             <th>Ingresos</th>
             <th>Salidas</th>
@@ -33,6 +133,11 @@
         {% for e in existencias %}
         <tr>
             <td>{{ e.producto.nombre }}</td>
+            <td>
+                <span style="background: #f1f5f9; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold;">
+                    {{ e.producto.tipo_producto or 'OBRA' }}
+                </span>
+            </td>
             <td>{{ e.producto.unidad }}</td>
 
             <td>
@@ -72,6 +177,12 @@
                 {% else %}
                     <span class="badge-success">DISPONIBLE</span>
                 {% endif %}
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="7" style="text-align: center; padding: 25px; color: #64748b;">
+                No hay productos en esta categoría para la bodega {{ bodega.nombre }}.
             </td>
         </tr>
         {% endfor %}

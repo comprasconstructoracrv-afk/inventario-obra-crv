@@ -236,7 +236,7 @@ margin:8mm;
         <div class="logo-box">
             <img src="{{ url_for('static', filename='logo.png') }}">
             <div>
-                <h1>INVENTARIO DE OBRA</h1>
+                <h1>INVENTARIO DE {{ empresa.nombre if empresa else session.get('empresa_nombre', "Obra CRV") }} </h1>
                 <p>Sistema Profesional de Control de Inventario</p>
             </div>
         </div>
@@ -250,8 +250,8 @@ margin:8mm;
     <div class="titulo">
         <div class="icono">📤</div>
         <div>
-            <h2>SALIDA DE MATERIAL</h2>
-            <p>Registro de materiales despachados a casas, zonas o puntos de obra.</p>
+            <h2>SALIDA DE PRODUCTOS</h2>
+            <p>Registro de productos/ material despachados a casas, sedes, zonas o puntos de obra.</p>
         </div>
     </div>
 
@@ -267,8 +267,8 @@ margin:8mm;
         </div>
 
         <div class="info-item">
-            <span>BODEGA DE ORIGEN</span>
-            <strong>{{ movimiento.obra.nombre if movimiento.obra else 'SIN BODEGA' }}</strong>
+            <span>SEDE/ BODEGA DE ORIGEN</span>
+            <strong>{{ movimiento.obra.nombre if movimiento.obra else 'SIN BODEGA' }} - {{ movimiento.obra.ubicacion if movimiento.obra else 'SIN DIRECCIÓN' }}</strong>
         </div>
 
         <div class="info-item">
@@ -292,8 +292,8 @@ margin:8mm;
             </tr>
 
             <tr>
-                <td>Bodega de salida</td>
-                <td>{{ movimiento.obra.nombre if movimiento.obra else 'SIN BODEGA' }}</td>
+                <td>Sede/ Bodega de salida</td>
+                <td>{{ movimiento.obra.nombre if movimiento.obra else 'SIN BODEGA' }} - {{ movimiento.obra.ubicacion if movimiento.obra else 'SIN DIRECCIÓN' }}</td>
             </tr>
 
             <tr>
@@ -364,12 +364,12 @@ margin:8mm;
     </div>
 
     <div class="nota">
-        Este documento es un comprobante de salida de material del inventario.
+        Este documento es un comprobante de salida de productos del inventario.
         Conserve este recibo para control y respaldo de la operación.
     </div>
 
     <div class="footer">
-        Inventario de Obra CRV - Sistema Profesional de Control de Inventario
+        Inventario de {{ empresa.nombre if empresa else session.get('empresa_nombre', "Obra CRV") }} - Sistema Profesional de Control de Inventario
     </div>
 
     <div class="acciones">

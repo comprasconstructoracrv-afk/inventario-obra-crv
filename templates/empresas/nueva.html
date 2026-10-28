@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+.crear-empresa-contenedor {
+    width: 100%;
+    margin: 0;
+    text-align: left;
+}
+
+/* TARJETA PRINCIPAL BLANCA AJUSTADA EN ANCHO */
+.crear-empresa-card {
+    background: white;
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.08);
+    max-width: 880px; /* Limita el ancho de la tarjeta blanca */
+}
+
+.crear-empresa-card h1 {
+    font-size: 36px;
+    color: #0f172a;
+    margin: 0 0 10px 0;
+    font-weight: 700;
+}
+
+.crear-empresa-card p {
+    font-size: 16px;
+    color: #64748b;
+    margin: 0 0 30px 0;
+}
+
+/* BLOQUE DE FORMULARIO INTERNO */
+.seccion-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 28px;
+    margin-bottom: 25px;
+    width: 100%;
+}
+
+.seccion-titulo {
+    font-size: 18px;
+    color: #0f172a;
+    font-weight: 600;
+    margin: 0 0 18px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.form-group-custom {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group-custom label {
+    font-size: 14px;
+    color: #0f172a;
+    font-weight: 600;
+}
+
+.form-group-custom label .requerido {
+    color: #ef4444;
+    margin-left: 2px;
+}
+
+.input-custom {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    font-size: 15px;
+    color: #0f172a;
+    transition: all 0.2s ease;
+}
+
+.input-custom:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+/* ACCIONES DE BOTONES */
+.acciones-formulario {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-guardar {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 14px 26px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-guardar:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+}
+
+.btn-cancelar {
+    background: #0f172a;
+    color: white;
+    padding: 14px 26px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.2s;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-cancelar:hover {
+    background: #1e293b;
+    transform: translateY(-2px);
+}
+</style>
+
+<div class="crear-empresa-contenedor">
+
+    <div class="crear-empresa-card">
+        <h1>Crear Empresa</h1>
+        <p>Ingrese el nombre de la nueva empresa que desea registrar en el sistema.</p>
+
+        <form method="POST">
+
+            <!-- BLOQUE DE FORMULARIO -->
+            <div class="seccion-box">
+                <div class="seccion-titulo">Datos de la Empresa</div>
+
+                <div class="form-group-custom">
+                    <label>
+                        Nombre de la Empresa <span class="requerido">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        name="nombre" 
+                        class="input-custom" 
+                        placeholder="Ej: ECOBIKE, COMERCIALIZADORA" 
+                        required 
+                        autofocus
+                    >
+                </div>
+            </div>
+
+            <!-- BOTONES DE ACCIÓN -->
+            <div class="acciones-formulario">
+                <button type="submit" class="btn-guardar">
+                    Guardar Empresa
+                </button>
+                <a href="/dashboard_principal" class="btn-cancelar">
+                    Cancelar
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

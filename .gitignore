@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+models/__pycache__/
+routes/__pycache__/
+*.db
+inventario_obra.db
+venv/
+.env

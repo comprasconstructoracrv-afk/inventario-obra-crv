@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    .contenedor {
+        max-width: 1300px;
+        margin: auto;
+        font-family: Arial, sans-serif;
+    }
+
+    /* ENCABEZADO SUPERIOR */
+    .encabezado {
+        background: white;
+        border-radius: 24px;
+        padding: 35px;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 30px;
+        flex-wrap: wrap;
+    }
+
+    .encabezado-texto h1 {
+        margin: 0;
+        font-size: 42px;
+        color: #102a43;
+        letter-spacing: 0.5px;
+        font-weight: bold;
+    }
+
+    .encabezado-texto p {
+        margin: 10px 0 0 0;
+        font-size: 16px;
+        color: #52606d;
+    }
+
+    .encabezado-logo img {
+        max-height: 110px;
+        width: auto;
+        object-fit: contain;
+    }
+
+    .acciones-dashboard {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+    }
+
+    .btn-dash {
+        padding: 10px 18px;
+        border-radius: 10px;
+        font-weight: bold;
+        color: white !important;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.25s ease;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+        font-size: 14px;
+    }
+
+    .btn-dash:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+    }
+
+    .btn-dash.azul {
+        background: linear-gradient(135deg, #3b82f6, #1e3a8a);
+    }
+
+    .btn-dash.rojo {
+        background: linear-gradient(135deg, #ef4444, #7f1d1d);
+    }
+
+    .btn-dash.gris {
+        background: linear-gradient(135deg, #6b7280, #374151);
+    }
+
+    .titulo-seccion {
+        margin: 10px 0 20px 0;
+        font-size: 26px;
+        font-weight: bold;
+        color: #102a43;
+    }
+
+    /* GRID DE TARJETAS DE SEDES */
+    .grid-sedes {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+        gap: 22px;
+    }
+
+    .card-sede {
+        background: white;
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        text-decoration: none;
+        color: inherit;
+        transition: 0.25s ease;
+        border-left: 8px solid #1677ff;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+    }
+
+    .card-sede:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 16px 35px rgba(0,0,0,0.12);
+    }
+
+    /* TÍTULO LIMPIO A ANCHO COMPLETO */
+    .card-sede h3 {
+        margin: 0 0 10px 0;
+        font-size: 22px;
+        line-height: 1.25;
+        color: #102a43;
+        font-weight: bold;
+        word-break: break-word;
+    }
+
+    /* FILA INFERIOR DE INSIGNIAS Y BOTONES */
+    .card-badges-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+
+    /* INSIGNIAS DE ESTADO */
+    .badge-activo {
+        background: #dcfce7;
+        color: #166534;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: bold;
+        display: inline-block;
+    }
+
+    .badge-inactivo {
+        background: #fee2e2;
+        color: #991b1b;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: bold;
+        display: inline-block;
+    }
+
+    /* BOTÓN EDITAR EMPRESA */
+    .btn-editar-empresa {
+        background: #f1f5f9;
+        color: #475569;
+        border: 1px solid #cbd5e1;
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: bold;
+        text-decoration: none;
+        transition: 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .btn-editar-empresa:hover {
+        background: #2563eb;
+        color: white;
+        border-color: #2563eb;
+    }
+
+    /* ESTADÍSTICAS INTERNAS */
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .stat-box {
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 12px;
+    }
+
+    .stat-box.full-width {
+        grid-column: span 2;
+    }
+
+    .stat-label {
+        font-size: 11px;
+        color: #6b7280;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+        font-weight: normal;
+    }
+
+    .stat-value {
+        font-size: 22px;
+        font-weight: bold;
+        color: #111827;
+    }
+
+    .stat-value.stock {
+        color: #1677ff;
+    }
+
+    @media (max-width: 700px) {
+        .encabezado {
+            text-align: center;
+            justify-content: center;
+        }
+
+        .acciones-dashboard {
+            justify-content: center;
+        }
+
+        .encabezado-texto h1 {
+            font-size: 34px;
+        }
+    }
+</style>
+
+<div class="contenedor">
+
+    <!-- ENCABEZADO -->
+    <div class="encabezado">
+        <div class="encabezado-texto">
+            <h1>INVENTARIO EMPRESAS</h1>
+            <p>Panel general de inventario por sede</p>
+
+            <div class="acciones-dashboard">
+                {% if current_user.rol == "ADMIN" %}
+                    <a href="/empresas/nueva" class="btn-dash azul">+ Crear Empresa</a>
+                    <a href="/usuarios" class="btn-dash gris">+ Crear Usuario</a>
+                {% endif %}
+                
+                <a href="/logout" class="btn-dash rojo">Cerrar sesión</a>
+            </div>
+        </div>
+
+        <div class="encabezado-logo">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo CRV">
+        </div>
+    </div>
+
+    <!-- TÍTULO DE SECCIÓN -->
+    <div class="titulo-seccion">Consultar inventario por empresa</div>
+
+    <!-- GRID DE SEDES / EMPRESAS -->
+    <div class="grid-sedes">
+        {% for item in empresas_data %}
+        <div class="card-sede">
+            
+            <div>
+                <!-- 1. Título de la empresa en su propia línea limpia -->
+                <h3>{{ item.empresa.nombre }}</h3>
+
+                <!-- 2. Badges de estado y edición ubicados abajo del título -->
+                <div class="card-badges-row">
+                    {% if item.empresa.estado == "ACTIVO" or item.empresa.activo %}
+                        <span class="badge-activo">ACTIVO</span>
+                    {% else %}
+                        <span class="badge-inactivo">INACTIVO</span>
+                    {% endif %}
+
+                    {% if current_user.rol == "ADMIN" %}
+                        <a href="/empresas/editar/{{ item.empresa.id }}" class="btn-editar-empresa" title="Editar empresa">
+                            Editar
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- 3. Área cliqueable que redirige a la sede seleccionada -->
+            <a href="/empresas/seleccionar/{{ item.empresa.id }}" style="text-decoration: none; color: inherit; display: block;">
+                <div class="stats">
+                    <div class="stat-box">
+                        <div class="stat-label">BODEGAS/ALMACENES</div>
+                        <div class="stat-value">{{ item.total_bodegas }}</div>
+                    </div>
+
+                    <div class="stat-box">
+                        <div class="stat-label">PRODUCTOS</div>
+                        <div class="stat-value">{{ item.total_productos }}</div>
+                    </div>
+
+                    <div class="stat-box full-width">
+                        <div class="stat-label">CANTIDAD STOCK</div>
+                        <div class="stat-value stock">
+                            {{ "{:,.2f}".format(item.total_cantidad).replace(",", "X").replace(".", ",").replace("X", ".") }}
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+{% endblock %}

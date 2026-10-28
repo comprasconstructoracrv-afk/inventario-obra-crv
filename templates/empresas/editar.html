@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+.editar-empresa-contenedor {
+    width: 100%;
+    margin: 0;
+    text-align: left;
+}
+
+/* TARJETA PRINCIPAL BLANCA AJUSTADA */
+.editar-empresa-card {
+    background: white;
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.08);
+    max-width: 680px;
+}
+
+.editar-empresa-card h1 {
+    font-size: 36px;
+    color: #0f172a;
+    margin: 0 0 10px 0;
+    font-weight: 700;
+}
+
+.editar-empresa-card p {
+    font-size: 16px;
+    color: #64748b;
+    margin: 0 0 30px 0;
+}
+
+/* BLOQUES INTERNOS DEL FORMULARIO */
+.seccion-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 28px;
+    margin-bottom: 25px;
+    width: 100%;
+}
+
+.seccion-titulo {
+    font-size: 18px;
+    color: #0f172a;
+    font-weight: 600;
+    margin: 0 0 18px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+}
+
+.form-group-custom {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group-custom label {
+    font-size: 14px;
+    color: #0f172a;
+    font-weight: 600;
+}
+
+.form-group-custom label .requerido {
+    color: #ef4444;
+    margin-left: 2px;
+}
+
+.input-custom, .select-custom {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    font-size: 15px;
+    color: #0f172a;
+    transition: all 0.2s ease;
+}
+
+.input-custom:focus, .select-custom:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+/* ACCIONES Y BOTONES */
+.acciones-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.grupo-guardar {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-guardar {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 14px 26px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-guardar:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+}
+
+.btn-cancelar {
+    background: #0f172a;
+    color: white;
+    padding: 14px 26px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.2s;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-cancelar:hover {
+    background: #1e293b;
+    transform: translateY(-2px);
+}
+
+.btn-eliminar {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fca5a5;
+    padding: 14px 22px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-eliminar:hover {
+    background: #dc2626;
+    color: white;
+    border-color: #dc2626;
+}
+
+/* MODAL DE ELIMINAR */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 450px;
+    width: 90%;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.modal-card h3 {
+    margin: 0 0 10px 0;
+    color: #0f172a;
+    font-size: 22px;
+}
+
+.modal-card p {
+    color: #64748b;
+    font-size: 15px;
+    margin-bottom: 25px;
+}
+
+.modal-acciones {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+</style>
+
+<div class="editar-empresa-contenedor">
+
+    <div class="editar-empresa-card">
+
+        <!-- ENCABEZADO -->
+        <h1>Editar Empresa</h1>
+        <p>Modifique la información, cambie su estado o elimine la empresa seleccionada.</p>
+
+        <form method="POST">
+
+            <!-- BLOQUE DE FORMULARIO -->
+            <div class="seccion-box">
+                <div class="seccion-titulo">Información General</div>
+
+                <div class="form-grid">
+                    <div class="form-group-custom">
+                        <label>
+                            Nombre de la Empresa <span class="requerido">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            name="nombre" 
+                            class="input-custom" 
+                            value="{{ empresa.nombre }}"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group-custom">
+                        <label>Estado Sede</label>
+                        <select name="estado" class="select-custom">
+                            <option value="ACTIVO" {% if empresa.estado == 'ACTIVO' or empresa.activo %}selected{% endif %}>ACTIVO</option>
+                            <option value="INACTIVO" {% if empresa.estado == 'INACTIVO' or not empresa.activo %}selected{% endif %}>INACTIVO</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOTONES DE ACCIÓN -->
+            <div class="acciones-flex">
+                <div class="grupo-guardar">
+                    <button type="submit" class="btn-guardar">
+                         Actualizar Empresa
+                    </button>
+                    <a href="/dashboard_principal" class="btn-cancelar">
+                        Cancelar
+                    </a>
+                </div>
+
+                <button type="button" class="btn-eliminar" onclick="abrirModal()">
+                     Eliminar
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- MODAL DE CONFIRMACIÓN DE ELIMINACIÓN PERMANENTE -->
+<div id="modalEliminar" class="modal-overlay">
+    <div class="modal-card">
+        <h3>¿Eliminar definitivamente?</h3>
+        <p>Esta acción borrará la empresa <strong>{{ empresa.nombre }}</strong> de forma permanente de la base de datos.</p>
+        
+        <div class="modal-acciones">
+            <a href="/empresas/eliminar/{{ empresa.id }}" class="btn-eliminar" style="text-decoration: none;">
+                Sí, Eliminar
+            </a>
+            <button type="button" class="btn-cancelar" onclick="cerrarModal()">
+                Cancelar
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function abrirModal() {
+    document.getElementById("modalEliminar").style.display = "flex";
+}
+
+function cerrarModal() {
+    document.getElementById("modalEliminar").style.display = "none";
+}
+</script>
+
+{% endblock %}

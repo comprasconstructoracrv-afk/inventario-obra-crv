@@ -292,7 +292,7 @@ td.producto{
             <img src="{{ url_for('static', filename='logo.png') }}">
 
             <div>
-                <h1>INVENTARIO DE OBRA</h1>
+                <h1>INVENTARIO DE {{ empresa.nombre if empresa else session.get('empresa_nombre', "Obra CRV") }}</h1>
                 <p>Sistema Profesional de Control de Inventario</p>
             </div>
         </div>
@@ -314,8 +314,8 @@ td.producto{
         <div class="icono">📤</div>
 
         <div>
-            <h2>SALIDA MÚLTIPLE DE MATERIAL</h2>
-            <p>Registro de varios materiales despachados a un mismo destino.</p>
+            <h2>SALIDA MÚLTIPLE DE PRODUCTOS</h2>
+            <p>Registro de varios productos despachados a un mismo destino.</p>
         </div>
     </div>
 
@@ -364,7 +364,7 @@ td.producto{
             <tr>
                 <th>Código</th>
                 <th>Producto</th>
-                <th>Bodega</th>
+                <th>Sede/ Bodega</th>
                 <th>Cantidad</th>
                 <th>Unidad</th>
                 <th>Observaciones</th>
@@ -378,7 +378,7 @@ td.producto{
                     {{ m.producto.nombre if m.producto else 'SIN PRODUCTO' }}
                 </td>
 
-                <td>{{ m.obra.nombre if m.obra else 'SIN BODEGA' }}</td>
+                <td>{{ m.obra.nombre if m.obra else 'SIN BODEGA' }}-{{ m.obra.ubicacion if m.obra else '' }}</td>
 
                 <td>
                     {{ "{:,.2f}".format(m.cantidad).replace(",", "X").replace(".", ",").replace("X", ".") }}
@@ -444,12 +444,12 @@ td.producto{
     </div>
 
     <div class="nota">
-        Este documento es un comprobante de salida múltiple de material.
+        Este documento es un comprobante de salida múltiple de productos.
         Conserve este recibo para control y respaldo de la operación.
     </div>
 
     <div class="footer">
-        Inventario de Obra CRV - Sistema Profesional de Control de Inventario
+        Inventario de {{ empresa.nombre if empresa else session.get('empresa_nombre', "Obra CRV") }} - Sistema Profesional de Control de Inventario
     </div>
 
     <div class="acciones">

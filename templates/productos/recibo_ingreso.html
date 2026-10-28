@@ -281,7 +281,7 @@ td:first-child{
             <img src="{{ url_for('static', filename='logo.png') }}">
 
             <div>
-                <h1>INVENTARIO DE OBRA</h1>
+                <h1>INVENTARIO DE {{ empresa.nombre if empresa else session.get('empresa_nombre', "Obra CRV") }}</h1>
                 <p>Sistema Profesional de Control de Inventario</p>
             </div>
         </div>
@@ -296,8 +296,8 @@ td:first-child{
         <div class="icono">📥</div>
 
         <div>
-            <h2>INGRESO DE MATERIAL</h2>
-            <p>Registro de material recibido y cargado al inventario.</p>
+            <h2>INGRESO DE PRODUCTO/ MATERIAL</h2>
+            <p>Registro de productos/ material recibido y cargado al inventario.</p>
         </div>
     </div>
 
@@ -313,8 +313,8 @@ td:first-child{
         </div>
 
         <div class="info-item">
-            <span>BODEGA DE INGRESO</span>
-            <strong>{{ bodega.nombre if bodega else 'SIN BODEGA' }}</strong>
+            <span>SEDE/ BODEGA DE INGRESO</span>
+            <strong>{{ bodega.nombre if bodega else 'SIN BODEGA' }} - {{ bodega.ubicacion if bodega else 'SIN UBICACIÓN' }}</strong>
         </div>
 
         <div class="info-item">
@@ -345,8 +345,8 @@ td:first-child{
             </tr>
 
             <tr>
-                <td>Bodega de ingreso</td>
-                <td>{{ bodega.nombre if bodega else '' }}</td>
+                <td>Sede/ Bodega de ingreso</td>
+                <td>{{ bodega.nombre if bodega else '' }} - {{ bodega.ubicacion if bodega else '' }}</td>
             </tr>
 
             <tr>
@@ -413,7 +413,7 @@ td:first-child{
     </div>
 
     <div class="footer">
-        Inventario de Obra CRV - Sistema Profesional de Control de Inventario
+        Inventario de {{ empresa.nombre if empresa else session.get('empresa_nombre', "Obra CRV") }}- Sistema Profesional de Control de Inventario
     </div>
 
     <div class="acciones">

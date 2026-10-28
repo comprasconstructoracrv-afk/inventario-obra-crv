@@ -8,3 +8,5 @@ class Obra(db.Model):
     ubicacion = db.Column(db.String(150))
     responsable = db.Column(db.String(100))
     estado = db.Column(db.String(30), default="ACTIVA")
+    
+    empresa_id = db.Column(db.Integer, db.ForeignKey("empresa.id"), nullable=False)

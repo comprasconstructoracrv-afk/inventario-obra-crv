@@ -1,10 +1,10 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, session, make_response
 from flask_login import login_required
 
 from models.destino import Destino
 from models.movimiento import Movimiento
+from models.obra import Obra
 
-from flask import make_response
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from io import BytesIO
@@ -15,18 +15,35 @@ consumos_bp = Blueprint("consumos", __name__)
 @consumos_bp.route("/consumos/destino")
 @login_required
 def consumo_por_destino():
+    empresa_id = session.get("empresa_id")
 
-    destinos = Destino.query.filter_by(
-        activo=True
-    ).order_by(
-        Destino.nombre.asc()
-    ).all()
+    if empresa_id and hasattr(Destino, "empresa_id"):
+        destinos = Destino.query.filter_by(
+            empresa_id=empresa_id,
+            activo=True
+        ).order_by(Destino.nombre.asc()).all()
+    else:
+        destinos = Destino.query.filter_by(activo=True).order_by(Destino.nombre.asc()).all()
+
+    if empresa_id:
+        bodegas_empresa = Obra.query.filter_by(empresa_id=empresa_id).all()
+        bodega_ids = [b.id for b in bodegas_empresa]
+    else:
+        bodega_ids = None
 
     for destino in destinos:
-        movimientos = Movimiento.query.filter(
+        query_mov = Movimiento.query.filter(
             Movimiento.tipo == "SALIDA",
             Movimiento.destino_id == destino.id
-        ).all()
+        )
+
+        if bodega_ids is not None:
+            if bodega_ids:
+                query_mov = query_mov.filter(Movimiento.obra_id.in_(bodega_ids))
+            else:
+                query_mov = query_mov.filter(Movimiento.id == -1)
+
+        movimientos = query_mov.all()
 
         productos_usados = set()
         total_cantidad = 0
@@ -46,15 +63,27 @@ def consumo_por_destino():
 @consumos_bp.route("/consumos/destino/<int:destino_id>")
 @login_required
 def detalle_destino(destino_id):
+    empresa_id = session.get("empresa_id")
 
-    destino = Destino.query.get_or_404(destino_id)
+    if empresa_id and hasattr(Destino, "empresa_id"):
+        destino = Destino.query.filter_by(id=destino_id, empresa_id=empresa_id).first_or_404()
+    else:
+        destino = Destino.query.get_or_404(destino_id)
 
-    movimientos = Movimiento.query.filter(
+    query_mov = Movimiento.query.filter(
         Movimiento.tipo == "SALIDA",
         Movimiento.destino_id == destino_id
-    ).order_by(
-        Movimiento.fecha.desc()
-    ).all()
+    )
+
+    if empresa_id:
+        bodegas_empresa = Obra.query.filter_by(empresa_id=empresa_id).all()
+        bodega_ids = [b.id for b in bodegas_empresa]
+        if bodega_ids:
+            query_mov = query_mov.filter(Movimiento.obra_id.in_(bodega_ids))
+        else:
+            query_mov = query_mov.filter(Movimiento.id == -1)
+
+    movimientos = query_mov.order_by(Movimiento.fecha.desc()).all()
 
     return render_template(
         "consumos/detalle_destino.html",
@@ -62,18 +91,32 @@ def detalle_destino(destino_id):
         movimientos=movimientos
     )
 
+
 @consumos_bp.route("/consumos/destino/<int:destino_id>/pdf")
 @login_required
 def destino_pdf(destino_id):
+    empresa_id = session.get("empresa_id")
+    empresa_nombre = session.get("empresa_nombre", "SISTEMA DE INVENTARIO")
 
-    destino = Destino.query.get_or_404(destino_id)
+    if empresa_id and hasattr(Destino, "empresa_id"):
+        destino = Destino.query.filter_by(id=destino_id, empresa_id=empresa_id).first_or_404()
+    else:
+        destino = Destino.query.get_or_404(destino_id)
 
-    movimientos = Movimiento.query.filter(
+    query_mov = Movimiento.query.filter(
         Movimiento.tipo == "SALIDA",
         Movimiento.destino_id == destino_id
-    ).order_by(
-        Movimiento.fecha.asc()
-    ).all()
+    )
+
+    if empresa_id:
+        bodegas_empresa = Obra.query.filter_by(empresa_id=empresa_id).all()
+        bodega_ids = [b.id for b in bodegas_empresa]
+        if bodega_ids:
+            query_mov = query_mov.filter(Movimiento.obra_id.in_(bodega_ids))
+        else:
+            query_mov = query_mov.filter(Movimiento.id == -1)
+
+    movimientos = query_mov.order_by(Movimiento.fecha.asc()).all()
 
     buffer = BytesIO()
     pdf = canvas.Canvas(buffer, pagesize=letter)
@@ -82,7 +125,7 @@ def destino_pdf(destino_id):
     y = height - 50
 
     pdf.setFont("Helvetica-Bold", 18)
-    pdf.drawCentredString(width / 2, y, "INVENTARIO DE OBRA CRV")
+    pdf.drawCentredString(width / 2, y, empresa_nombre.upper())
     y -= 24
 
     pdf.setFont("Helvetica", 10)
@@ -142,11 +185,11 @@ def destino_pdf(destino_id):
         total += m.cantidad
 
         pdf.drawString(43, y, m.fecha.strftime("%d/%m/%Y"))
-        pdf.drawString(95, y, m.producto.nombre[:18])
-        pdf.drawString(190, y, m.producto.codigo[:8])
-        pdf.drawString(245, y, m.obra.nombre[:13])
+        pdf.drawString(95, y, m.producto.nombre[:18] if m.producto else "-")
+        pdf.drawString(190, y, m.producto.codigo[:8] if m.producto else "-")
+        pdf.drawString(245, y, m.obra.nombre[:13] if m.obra else "-")
         pdf.drawRightString(365, y, f"{m.cantidad:,.2f}")
-        pdf.drawString(385, y, m.producto.unidad[:10])
+        pdf.drawString(385, y, m.producto.unidad[:10] if m.producto else "-")
         pdf.drawString(445, y, (m.observaciones or "")[:25])
 
         y -= 16
@@ -156,7 +199,7 @@ def destino_pdf(destino_id):
     pdf.drawRightString(365, y, f"TOTAL: {total:,.2f}")
 
     pdf.setFont("Helvetica", 8)
-    pdf.drawCentredString(width / 2, 35, "Documento generado por Inventario de Obra CRV")
+    pdf.drawCentredString(width / 2, 35, f"Documento generado por {empresa_nombre}")
 
     pdf.save()
     buffer.seek(0)

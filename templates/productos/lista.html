@@ -3,145 +3,319 @@
 {% block content %}
 
 <style>
-.productos-toolbar{
-    background:white;
-    border-radius:18px;
-    padding:18px;
-    margin-bottom:18px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:16px;
-    box-shadow:0 4px 14px rgba(0,0,0,0.08);
-}
-
-.productos-search{
-    display:flex;
-    gap:10px;
-    align-items:center;
-    width:520px;
-}
-
-.productos-search input{
-    flex:1;
-    height:42px;
-    margin:0;
-}
-
-.productos-search button{
-    height:42px;
-}
-
-.productos-table-card{
-    background:white;
-    border-radius:18px;
-    padding:18px;
-    box-shadow:0 4px 14px rgba(0,0,0,0.08);
-}
-
-.productos-table td,
-.productos-table th{
-    text-align:center;
-    vertical-align:middle;
-}
-
-@media(max-width:900px){
-    .productos-toolbar{
-        flex-direction:column;
-        align-items:stretch;
+    /* TARJETAS/CAJAS DE CATEGORÍAS DINÁMICAS */
+    .categorias-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 18px;
+        margin-bottom: 24px;
     }
 
-    .productos-search{
-        width:100%;
+    .card-categoria {
+        background: white;
+        border-radius: 18px;
+        padding: 20px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+        text-decoration: none;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        border: 2px solid transparent;
+        transition: all 0.25s ease;
     }
-}
+
+    .card-categoria:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-categoria.activa {
+        border-color: #2563eb;
+        background: #f0f6ff;
+    }
+
+    .card-categoria .icono-cat {
+        width: 50px;
+        height: 50px;
+        border-radius: 14px;
+        background: #e0f2fe;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    .card-categoria .info-cat strong {
+        display: block;
+        font-size: 16px;
+        color: #0f172a;
+    }
+
+    .card-categoria .info-cat span {
+        font-size: 13px;
+        color: #64748b;
+    }
+
+    .card-categoria .count-badge {
+        margin-left: auto;
+        background: #0f172a;
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+        padding: 4px 10px;
+        border-radius: 999px;
+    }
+
+    .card-categoria.activa .count-badge {
+        background: #2563eb;
+    }
+
+    /* BOTÓN DE STOCK SENCILLO (NEGRO Y FONDO BLANCO) */
+    .btn-stock-simple {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        padding: 6px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        color: #0f172a;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.15s ease;
+    }
+
+    .btn-stock-simple:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+    }
+
+    /* MODAL SENCILLO */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(15, 23, 42, 0.5);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-content-sedes {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        width: 90%;
+        max-width: 420px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    .modal-header-sedes {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 12px;
+        margin-bottom: 16px;
+    }
+
+    .modal-header-sedes h3 {
+        margin: 0;
+        color: #0f172a;
+        font-size: 18px;
+    }
+
+    .close-modal-sedes {
+        background: none;
+        border: none;
+        font-size: 22px;
+        color: #64748b;
+        cursor: pointer;
+    }
+
+    .lista-sedes-item {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 10px 14px;
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 14px;
+        color: #0f172a;
+    }
+
+    .lista-sedes-item strong {
+        color: #0f172a;
+    }
 </style>
 
-<div class="page-header-card">
-    <h1>Productos</h1>
-    <p>Catálogo general de materiales del inventario.</p>
+<div class="page-header-card" style="background: white; border-radius: 22px; padding: 28px; text-align: center; margin-bottom: 24px; box-shadow: 0 6px 20px rgba(0,0,0,0.06);">
+    <h1 style="margin: 0; font-size: 32px; color: #0f172a;">Productos</h1>
+    <p style="margin: 8px 0 0 0; color: #64748b;">Catálogo general de materiales e ítems del inventario.</p>
 </div>
 
-<div class="productos-toolbar no-print">
+<!-- SECCIÓN DE CAJAS DINÁMICAS POR TIPO DE PRODUCTO -->
+<div class="categorias-grid">
+    <a href="/productos?tipo=TODOS{% if buscar %}&buscar={{ buscar }}{% endif %}" 
+       class="card-categoria {% if tipo_filtro == 'TODOS' %}activa{% endif %}">
+        <div class="icono-cat">📦</div>
+        <div class="info-cat">
+            <strong>Todos</strong>
+            <span>Catálogo completo</span>
+        </div>
+        <div class="count-badge">{{ conteo_todos }}</div>
+    </a>
 
-    <a class="btn btn-success" href="/productos/nuevo">
+    {% for cat in categorias_cards %}
+    <a href="/productos?tipo={{ cat.codigo }}{% if buscar %}&buscar={{ buscar }}{% endif %}" 
+       class="card-categoria {% if tipo_filtro == cat.codigo %}activa{% endif %}">
+        <div class="icono-cat">{{ cat.icono }}</div>
+        <div class="info-cat">
+            <strong>{{ cat.nombre }}</strong>
+            <span>Categoría {{ cat.nombre }}</span>
+        </div>
+        <div class="count-badge">{{ cat.cantidad }}</div>
+    </a>
+    {% endfor %}
+</div>
+
+<!-- BARRA DE BÚSQUEDA Y BOTÓN NUEVO -->
+<div style="background: white; border-radius: 18px; padding: 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; box-shadow: 0 4px 14px rgba(0,0,0,0.06);">
+    <a href="/productos/nuevo" class="btn" style="background: #16a34a; color: white; border-radius: 12px; padding: 12px 20px; font-weight: bold; text-decoration: none;">
         + Nuevo Producto
     </a>
 
-    <form method="GET" class="productos-search">
-        <input
-            type="text"
-            name="buscar"
-            placeholder="Buscar por código o nombre"
-            value="{{ request.args.get('buscar', '') }}"
-        >
-
-        <button type="submit" class="btn btn-dark">
+    <form method="GET" action="/productos" style="display: flex; gap: 10px;">
+        <input type="hidden" name="tipo" value="{{ tipo_filtro }}">
+        <input type="text" name="buscar" value="{{ buscar }}" placeholder="Buscar por código o nombre" class="form-control" style="padding: 10px 16px; border-radius: 12px; border: 1px solid #cbd5e1; width: 280px;">
+        <button type="submit" class="btn" style="background: #0f172a; color: white; border-radius: 12px; padding: 10px 20px; font-weight: bold; border: none; cursor: pointer;">
             Buscar
         </button>
     </form>
-
 </div>
 
-<div class="productos-table-card">
+<!-- TABLA DE PRODUCTOS -->
+<div style="background: white; border-radius: 18px; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.06);">
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background: #0f172a; color: white; text-align: center;">
+                <th style="padding: 14px;">Código</th>
+                <th style="padding: 14px; text-align: left;">Nombre</th>
+                <th style="padding: 14px;">Tipo</th>
+                <th style="padding: 14px;">Unidad</th>
+                <th style="padding: 14px;">Stock</th>
+                <th style="padding: 14px;">Estado</th>
+                <th style="padding: 14px;">Acciones</th>
+                <th style="padding: 14px;">Historial</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in productos %}
+            <tr style="border-bottom: 1px solid #e2e8f0; text-align: center;">
+                <td style="padding: 14px;"><strong>{{ p.codigo }}</strong></td>
+                <td style="padding: 14px; text-align: left;">{{ p.nombre }}</td>
+                <td style="padding: 14px;"><span style="background: #f1f5f9; padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: bold;">{{ p.tipo_producto }}</span></td>
+                <td style="padding: 14px;">{{ p.unidad }}</td>
+                
+                <!-- STOCK SENCILLO -->
+                <td style="padding: 14px;">
+                    <button type="button" 
+                            class="btn-stock-simple" 
+                            onclick='mostrarDetalleSedes("{{ p.nombre }}", {{ producto_bodegas[p.id] | tojson }})'
+                            title="Ver sedes">
+                        {{ p.stock | round(2) }} 🔍
+                    </button>
+                </td>
 
-    <table class="productos-table">
-        <tr>
-            <th>Código</th>
-            <th>Nombre</th>
-            <th>Unidad</th>
-            <th>Stock</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-        </tr>
+                <td style="padding: 14px;">
+                    {% if p.stock > 0 %}
+                        <span style="background: #dcfce7; color: #166534; padding: 4px 12px; border-radius: 999px; font-weight: bold; font-size: 12px;">Disponible</span>
+                    {% else %}
+                        <span style="background: #fee2e2; color: #991b1b; padding: 4px 12px; border-radius: 999px; font-weight: bold; font-size: 12px;">Agotado</span>
+                    {% endif %}
+                </td>
+                <td style="padding: 14px;">
+                    <div style="display: flex; gap: 6px; justify-content: center;">
+                        <a href="/productos/ingresar/{{ p.id }}" style="background: #16a34a; color: white; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: bold;">Ingresar</a>
+                        {% if current_user.rol == "ADMIN" %}
+                        <a href="/productos/editar/{{ p.id }}" style="background: #2563eb; color: white; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: bold;">Editar</a>
+                        <a href="/productos/eliminar/{{ p.id }}" onclick="return confirm('¿Eliminar producto?')" style="background: #dc2626; color: white; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: bold;">Eliminar</a>
+                        {% endif %}
+                    </div>
+                </td>
 
-        {% for p in productos %}
-        <tr>
-            <td>{{ p.codigo }}</td>
-
-            <td>{{ p.nombre }}</td>
-
-            <td>{{ p.unidad }}</td>
-
-            <td>
-                {% if p.stock == p.stock|int %}
-                    {{ p.stock|int }}
-                {% else %}
-                    {{ "{:,.2f}".format(p.stock).replace(",", "X").replace(".", ",").replace("X", ".") }}
-                {% endif %}
-            </td>
-
-            <td>
-                {% if p.stock <= 0 %}
-                    <span class="badge-danger">Agotado</span>
-                {% else %}
-                    <span class="badge-success">Disponible</span>
-                {% endif %}
-            </td>
-
-            <td>
-                <a class="btn btn-small btn-success" href="/productos/ingresar/{{ p.id }}">
-                    Ingresar
-                </a>
-
-                {% if current_user.rol == "ADMIN" %}
-
-                <a class="btn btn-small" href="/productos/editar/{{ p.id }}">
-                    Editar
-                </a>
-
-                <a href="/productos/eliminar/{{ p.id }}"
-                class="btn btn-small btn-danger"
-                onclick="return confirm('¿Desea eliminar el producto {{ p.nombre }}?')">
-                    Eliminar
-                </a>
-
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
+                <td style="padding: 14px;">
+                    <div style="display: flex; gap: 6px; justify-content: center;">
+                        <a href="/historial-producto?producto_id={{ p.id }}" style="background: #2563eb; color: white; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: bold;">Ver Historial</a>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="8" style="padding: 30px; text-align: center; color: #64748b;">
+                    No se encontraron productos en esta categoría.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
-
 </div>
+
+<!-- MODAL SIMPLE DE SEDES -->
+<div class="modal-overlay" id="modalSedes" onclick="cerrarModalSedes(event)">
+    <div class="modal-content-sedes" onclick="event.stopPropagation()">
+        <div class="modal-header-sedes">
+            <h3 id="modalProductoTitulo">Distribución por Sede</h3>
+            <button class="close-modal-sedes" onclick="cerrarModalSedesDirecto()">&times;</button>
+        </div>
+
+        <div id="modalContenidoSedes">
+            <!-- La lista de sedes se inserta aquí -->
+        </div>
+    </div>
+</div>
+
+<script>
+    function mostrarDetalleSedes(nombreProducto, bodegasLista) {
+        document.getElementById("modalProductoTitulo").textContent = nombreProducto;
+        const contenedor = document.getElementById("modalContenidoSedes");
+        contenedor.innerHTML = "";
+
+        if (!bodegasLista || bodegasLista.length === 0) {
+            contenedor.innerHTML = '<p style="text-align: center; color: #64748b; margin: 10px 0;">Sin existencias en ninguna sede.</p>';
+        } else {
+            bodegasLista.forEach(item => {
+                const partes = item.split(":");
+                const sedeNombre = partes[0] ? partes[0].trim() : "Sede";
+                const cantidadValor = partes[1] ? partes[1].trim() : "0";
+
+                const divItem = document.createElement("div");
+                divItem.className = "lista-sedes-item";
+                divItem.innerHTML = `
+                    <span>${sedeNombre}</span>
+                    <strong>${cantidadValor}</strong>
+                `;
+                contenedor.appendChild(divItem);
+            });
+        }
+
+        document.getElementById("modalSedes").style.display = "flex";
+    }
+
+    function cerrarModalSedesDirecto() {
+        document.getElementById("modalSedes").style.display = "none";
+    }
+
+    function cerrarModalSedes(event) {
+        if (event.target.id === "modalSedes") {
+            document.getElementById("modalSedes").style.display = "none";
+        }
+    }
+</script>
 
 {% endblock %}

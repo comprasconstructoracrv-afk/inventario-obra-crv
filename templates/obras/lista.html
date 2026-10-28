@@ -4,7 +4,7 @@
 
 <div class="header-actions no-print">
     <div class="left-actions">
-        <a class="btn btn-new" href="/obras/nueva">Nueva Bodega</a>
+        <a class="btn btn-new" href="/obras/nueva">Nueva Sede/ Bodega</a>
     </div>
 
     <div class="right-actions">
@@ -15,8 +15,8 @@
 </div>
 
 <div class="page-header-card">
-    <h1>Bodegas</h1>
-    <p>Resumen general de bodegas y puntos de almacenamiento.</p>
+    <h1>Sedes/ Bodegas</h1>
+    <p>Resumen general de sedes/ bodegas y puntos de almacenamiento.</p>
 </div>
 
 <div class="bodega-grid">
@@ -52,7 +52,7 @@
             <a class="btn btn-small btn-edit" href="/obras/editar/{{ item.obra.id }}">Editar</a>
             <a href="/obras/eliminar/{{ item.obra.id }}"
             class="btn btn-small btn-danger"
-            onclick="return confirm('¿Desea eliminar la bodega {{ item.obra.nombre }}?')">
+            onclick="return confirm('¿Desea eliminar la sede/ bodega {{ item.obra.nombre }}?')">
                 Eliminar
             </a>
             {% endif %}

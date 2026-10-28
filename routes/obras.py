@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, send_file
+from flask import Blueprint, render_template, request, redirect, url_for, send_file, session
 from flask_login import login_required
 from models.obra import Obra
 from models.existencia import Existencia
@@ -16,7 +16,13 @@ obras_bp = Blueprint("obras", __name__)
 @obras_bp.route("/obras")
 @login_required
 def listar_obras():
-    obras = Obra.query.order_by(Obra.nombre.asc()).all()
+    empresa_id = session.get("empresa_id")
+
+    # 🔍 Filtrar bodegas pertenecientes únicamente a la empresa seleccionada
+    if empresa_id:
+        obras = Obra.query.filter_by(empresa_id=empresa_id).order_by(Obra.nombre.asc()).all()
+    else:
+        obras = Obra.query.order_by(Obra.nombre.asc()).all()
 
     bodegas_data = []
 
@@ -57,11 +63,14 @@ def listar_obras():
 @login_required
 def nueva_obra():
     if request.method == "POST":
+        empresa_id = session.get("empresa_id") # 📌 Asignar la empresa activa de la sesión
+
         obra = Obra(
             nombre=request.form["nombre"].upper(),
             ubicacion=request.form["ubicacion"].upper(),
             responsable=request.form["responsable"].upper(),
-            estado=request.form["estado"]
+            estado=request.form["estado"],
+            empresa_id=empresa_id
         )
         db.session.add(obra)
         db.session.commit()
@@ -105,7 +114,13 @@ def eliminar_obra(id):
 @obras_bp.route("/obras/excel")
 @login_required
 def exportar_obras_excel():
-    obras = Obra.query.order_by(Obra.nombre.asc()).all()
+    empresa_id = session.get("empresa_id")
+
+    # 🔍 Reporte filtrado por empresa
+    if empresa_id:
+        obras = Obra.query.filter_by(empresa_id=empresa_id).order_by(Obra.nombre.asc()).all()
+    else:
+        obras = Obra.query.order_by(Obra.nombre.asc()).all()
 
     wb = Workbook()
     ws = wb.active
@@ -133,7 +148,13 @@ def exportar_obras_excel():
 @obras_bp.route("/obras/pdf")
 @login_required
 def exportar_obras_pdf():
-    obras = Obra.query.order_by(Obra.nombre.asc()).all()
+    empresa_id = session.get("empresa_id")
+
+    # 🔍 Reporte filtrado por empresa
+    if empresa_id:
+        obras = Obra.query.filter_by(empresa_id=empresa_id).order_by(Obra.nombre.asc()).all()
+    else:
+        obras = Obra.query.order_by(Obra.nombre.asc()).all()
 
     archivo = BytesIO()
     pdf = canvas.Canvas(archivo, pagesize=letter)

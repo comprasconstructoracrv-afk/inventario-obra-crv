@@ -78,17 +78,17 @@
                 </div>
 
                 <div>
-                    <label>Bodega a la que ingresa</label>
+                    <label>Sede/ Bodega a la que ingresa</label>
 
                     <select name="obra_id" required>
 
                         <option value="">
-                            Seleccione una bodega
+                            Seleccione una sede/ bodega
                         </option>
 
                         {% for bodega in bodegas %}
                         <option value="{{ bodega.id }}">
-                            {{ bodega.nombre }}
+                            {{ bodega.nombre }} - {{ bodega.ubicacion }}
                         </option>
                         {% endfor %}
 
@@ -107,15 +107,6 @@
                 required
             >
 
-            <label>Responsable del ingreso</label>
-
-            <input
-                type="text"
-                name="responsable"
-                placeholder="Nombre completo del responsable"
-                required
-            >
-
             <label>Observaciones (opcional)</label>
 
             <input
@@ -124,10 +115,18 @@
                 placeholder="Factura, proveedor, remisión, comentario..."
             >
 
+            <label>Responsable del ingreso</label>
+            <input
+                type="text"
+                name="responsable"
+                placeholder="Nombre completo del responsable"
+                required
+            >
+
             <div class="alerta-info">
 
                 ⚠️ La cantidad ingresada se sumará automáticamente
-                al inventario de la bodega seleccionada.
+                al inventario de la sede/ bodega seleccionada.
 
             </div>
 

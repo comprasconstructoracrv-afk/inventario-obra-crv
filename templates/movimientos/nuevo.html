@@ -2,130 +2,129 @@
 
 {% block content %}
 
-
 <style>
-.salida-page-title{
-    background:white;
-    border-radius:22px;
-    padding:34px;
-    margin-bottom:28px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:20px;
-    box-shadow:0 6px 20px rgba(0,0,0,0.08);
+.salida-page-title {
+    background: white;
+    border-radius: 22px;
+    padding: 34px;
+    margin-bottom: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
 }
 
-.salida-page-title .icono{
-    width:78px;
-    height:78px;
-    border-radius:50%;
-    background:#fee2e2;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:36px;
+.salida-page-title .icono {
+    width: 78px;
+    height: 78px;
+    border-radius: 50%;
+    background: #fee2e2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
 }
 
-.salida-page-title h1{
-    margin:0;
-    font-size:36px;
-    color:#0f172a;
+.salida-page-title h1 {
+    margin: 0;
+    font-size: 36px;
+    color: #0f172a;
 }
 
-.salida-page-title p{
-    margin-top:8px;
-    color:#64748b;
-    font-size:16px;
+.salida-page-title p {
+    margin-top: 8px;
+    color: #64748b;
+    font-size: 16px;
 }
 
-.formulario-card{
-    background:white;
-    border-radius:22px;
-    padding:30px;
-    box-shadow:0 6px 20px rgba(0,0,0,0.08);
+.formulario-card {
+    background: white;
+    border-radius: 22px;
+    padding: 30px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
 }
 
-.formulario-card h3{
-    color:#2563eb;
-    font-size:22px;
-    margin-bottom:25px;
+.formulario-card h3 {
+    color: #2563eb;
+    font-size: 22px;
+    margin-bottom: 25px;
 }
 
-.form-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:26px;
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 26px;
 }
 
-.form-group{
-    margin-bottom:22px;
+.form-group {
+    margin-bottom: 22px;
 }
 
-.form-group label{
-    display:block;
-    margin-bottom:9px;
-    font-weight:700;
-    color:#0f172a;
+.form-group label {
+    display: block;
+    margin-bottom: 9px;
+    font-weight: 700;
+    color: #0f172a;
 }
 
 .formulario-card input,
-.formulario-card select{
-    width:100%;
-    box-sizing:border-box;
-    padding:15px 16px;
-    border-radius:14px;
-    border:1px solid #cbd5e1;
-    background:#f8fafc;
-    font-size:15px;
+.formulario-card select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 15px 16px;
+    border-radius: 14px;
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    font-size: 15px;
 }
 
 .formulario-card input:focus,
-.formulario-card select:focus{
-    outline:none;
-    border-color:#2563eb;
-    background:white;
-    box-shadow:0 0 0 4px rgba(37,99,235,0.12);
+.formulario-card select:focus {
+    outline: none;
+    border-color: #2563eb;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(37,99,235,0.12);
 }
 
-.alerta-info{
-    background:#fff7ed;
-    border:1px solid #fdba74;
-    color:#c2410c;
-    padding:18px;
-    border-radius:16px;
-    font-weight:700;
-    margin-top:10px;
+.alerta-info {
+    background: #fff7ed;
+    border: 1px solid #fdba74;
+    color: #c2410c;
+    padding: 18px;
+    border-radius: 16px;
+    font-weight: 700;
+    margin-top: 10px;
 }
 
-.acciones-formulario{
-    display:flex;
-    gap:15px;
-    margin-top:25px;
+.acciones-formulario {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
 }
 
-.btn-guardar{
-    background:#16a34a;
-    color:white;
-    border:none;
-    padding:16px 28px;
-    border-radius:14px;
-    font-weight:bold;
-    cursor:pointer;
+.btn-guardar {
+    background: #16a34a;
+    color: white;
+    border: none;
+    padding: 16px 28px;
+    border-radius: 14px;
+    font-weight: bold;
+    cursor: pointer;
 }
 
-.btn-cancelar{
-    background:#0f172a;
-    color:white;
-    padding:16px 28px;
-    border-radius:14px;
-    text-decoration:none;
-    font-weight:bold;
+.btn-cancelar {
+    background: #0f172a;
+    color: white;
+    padding: 16px 28px;
+    border-radius: 14px;
+    text-decoration: none;
+    font-weight: bold;
 }
 
-@media(max-width:1000px){
-    .form-grid{
-        grid-template-columns:1fr;
+@media(max-width:1000px) {
+    .form-grid {
+        grid-template-columns: 1fr;
     }
 }
 </style>
@@ -141,7 +140,7 @@
 
     <div>
         <h1>Nueva Salida</h1>
-        <p>Registro de materiales despachados a casas, zonas o puntos de obra.</p>
+        <p>Registro de productos, bicicletas y materiales despachados a casas, clientes, zonas o puntos de obra.</p>
     </div>
 </div>
 
@@ -167,22 +166,17 @@
                 </select>
             </div>
 
-            <div>
-                <label>Bodega de salida</label>
+            <div class="form-group">
+                <label>Sede/ Bodega de salida</label>
 
                 <select name="obra_id" id="obra_id" required>
+                    <option value="">Seleccione bodega origen</option>
 
-                    <option value="">Seleccione una bodega</option>
-
-                    {% for e in existencias %}
-                    <option
-                        value="{{ e.obra.id }}"
-                        data-producto="{{ e.producto.id }}"
-                    >
-                        {{ e.obra.nombre }}
+                    {% for b in bodegas %}
+                    <option value="{{ b.id }}" data-nombre="{{ b.nombre }}">
+                        {{ b.nombre }}
                     </option>
                     {% endfor %}
-
                 </select>
             </div>
 
@@ -211,7 +205,7 @@
                     type="number"
                     step="0.01"
                     name="cantidad"
-                    placeholder="Ingrese la cantidad"
+                    placeholder="Ingrese la cantidad a trasladar"
                     required
                 >
             </div>
@@ -225,6 +219,19 @@
                 type="text"
                 name="observaciones"
                 placeholder="Ej: entregado a maestro, material para enchape, vivienda, urbanismo..."
+            >
+        </div>
+
+        <div class="form-group">
+            <label>Responsable</label>
+
+            <input
+                type="text"
+                name="responsable"
+                placeholder="Nombre del responsable"
+            >
+        </div>
+
             >
         </div>
 
@@ -249,18 +256,54 @@
 </form>
 
 <script>
-    const existencias = JSON.parse('{{ existencias_json | safe }}');
+    const existenciasData = JSON.parse('{{ existencias_json | safe }}');
 
     const productoSelect = document.getElementById("producto_id");
     const bodegaSelect = document.getElementById("obra_id");
 
+    // Guardar las opciones originales de bodegas
+    const opcionesBodegas = Array.from(bodegaSelect.querySelectorAll("option")).filter(opt => opt.value !== "");
+
     productoSelect.addEventListener("change", function () {
         const productoId = this.value;
 
-        if (existencias[productoId]) {
-            bodegaSelect.value = existencias[productoId];
-        } else {
-            bodegaSelect.value = "";
+        // Resetear select de bodegas
+        bodegaSelect.innerHTML = "";
+
+        if (!productoId || !existenciasData[productoId]) {
+            const defaultOpt = document.createElement("option");
+            defaultOpt.value = "";
+            defaultOpt.textContent = "Seleccione bodega origen";
+            bodegaSelect.appendChild(defaultOpt);
+            return;
+        }
+
+        const bodegasDisponibles = existenciasData[productoId];
+
+        // Opción por defecto según la imagen
+        const defaultOpt = document.createElement("option");
+        defaultOpt.value = "";
+        defaultOpt.textContent = "Seleccione bodega origen";
+        bodegaSelect.appendChild(defaultOpt);
+
+        // Mostrar solo bodegas con existencias en el formato exacto: NOMBRE (Disponible: X)
+        bodegasDisponibles.forEach(item => {
+            const optOriginal = opcionesBodegas.find(o => o.value == item.obra_id);
+            if (optOriginal) {
+                const newOpt = document.createElement("option");
+                newOpt.value = item.obra_id;
+                
+                // Formatear cantidad (ejemplo: 10 o 0.94)
+                let cantFormateada = Number.isInteger(item.cantidad) ? item.cantidad : item.cantidad.toString().replace('.', ',');
+
+                newOpt.textContent = `${optOriginal.getAttribute("data-nombre")} (Disponible: ${cantFormateada})`;
+                bodegaSelect.appendChild(newOpt);
+            }
+        });
+
+        // Autoseleccionar si solo hay 1 bodega disponible
+        if (bodegasDisponibles.length === 1) {
+            bodegaSelect.value = bodegasDisponibles[0].obra_id;
         }
     });
 </script>

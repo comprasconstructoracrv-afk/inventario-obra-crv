@@ -58,8 +58,8 @@
 </style>
 
 <div class="page-header-card">
-    <h1>Salidas de Material</h1>
-    <p>Registro de materiales despachados a casas, zonas y puntos de obra.</p>
+    <h1>Salida de Productos</h1>
+    <p>Registro de productos/ materiales despachados a casas, sedes, zonas y puntos de obra.</p>
 </div>
 
 <div class="movimientos-toolbar no-print">
@@ -96,10 +96,11 @@
         <tr>
             <th>Fecha</th>
             <th>Producto</th>
-            <th>Bodega</th>
+            <th>Sede/ Bodega</th>
             <th>Cantidad</th>
             <th>Destino</th>
             <th>Observaciones</th>
+            <th>Responsable</th>
             <th>Acciones</th>
         </tr>
 
@@ -111,7 +112,7 @@
 
             <td>{{ m.producto.nombre if m.producto else "SIN PRODUCTO" }}</td>
 
-            <td>{{ m.obra.nombre if m.obra else "SIN BODEGA" }}</td>
+            <td>{{ m.obra.nombre if m.obra else "SIN BODEGA" }}- {{ m.obra.ubicacion if m.obra else '' }}</td>
 
             <td>
                 {{ "{:,.2f}".format(m.cantidad).replace(",", "X").replace(".", ",").replace("X", ".") }}
@@ -126,6 +127,8 @@
             </td>
 
             <td>{{ m.observaciones }}</td>
+            
+            <td>{{ m.responsable if m.responsable else "SIN RESPONSABLE" }}</td>
 
             <td>
                 {% if current_user.rol == "ADMIN" %}
@@ -139,6 +142,22 @@
                     Eliminar
                 </a>
                 {% endif %}
+
+                {% if m.salida_grupal_id %}
+                    <a href="{{ url_for('movimientos.recibo_salida_multiple', id=m.salida_grupal_id) }}" 
+                    class="btn-recibo" 
+                    style="background: #0284c7; color: white; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px;">
+                        Ver recibo
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('movimientos.recibo_salida', id=m.id) }}" 
+                    class="btn-recibo" 
+                    style="background: #0284c7; color: white; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px;">
+                        Ver recibo
+                    </a>
+                {% endif %}
+
+
         </tr>
         {% endfor %}
     </table>

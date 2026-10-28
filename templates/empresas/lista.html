@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+/* Estilos inspirados en el panel Financiera CRV */
+.empresa-header-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.empresa-header-card h1 {
+    margin: 0;
+    font-size: 36px;
+    color: #0f172a;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.empresa-header-card p {
+    margin: 6px 0 0 0;
+    color: #64748b;
+    font-size: 16px;
+}
+
+.btn-crear-empresa {
+    background: #2563eb;
+    color: white;
+    padding: 12px 22px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 15px;
+    transition: 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-crear-empresa:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+}
+
+.empresas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 22px;
+}
+
+.empresa-card {
+    background: white;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    border-left: 6px solid #2563eb;
+    position: relative;
+    transition: 0.2s;
+}
+
+.empresa-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.empresa-card h2 {
+    margin: 0 0 18px 0;
+    font-size: 24px;
+    color: #0f172a;
+    font-weight: 800;
+}
+
+.empresa-kpis-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.kpi-box {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+}
+
+.kpi-box span {
+    display: block;
+    font-size: 11px;
+    color: #64748b;
+    font-weight: bold;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+}
+
+.kpi-box strong {
+    font-size: 22px;
+    color: #0f172a;
+}
+
+.empresa-actions {
+    margin-top: 18px;
+    text-align: right;
+}
+
+.badge-activo {
+    background: #dcfce7;
+    color: #166534;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: bold;
+    float: right;
+}
+</style>
+
+<!-- TARJETA SUPERIOR DE ENCABEZADO -->
+<div class="empresa-header-card">
+    <div>
+        <h1>EMPRESAS / SEDES</h1>
+        <p>Panel general de control de inventarios por empresa</p>
+    </div>
+
+    {% if current_user.rol == "ADMIN" %}
+    <div>
+        <a href="/empresas/nueva" class="btn-crear-empresa">
+            + Crear empresa
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- CUADRÍCULA DE TARJETAS POR EMPRESA -->
+<div class="empresas-grid">
+    {% for item in empresas_data %}
+    <div class="empresa-card">
+        <span class="badge-activo">{{ item.empresa.estado }}</span>
+        <h2>{{ item.empresa.nombre }}</h2>
+
+        <div class="empresa-kpis-grid">
+            <div class="kpi-box">
+                <span>BODEGAS</span>
+                <strong>{{ item.total_bodegas }}</strong>
+            </div>
+
+            <div class="kpi-box">
+                <span>PRODUCTOS</span>
+                <strong>{{ item.total_productos }}</strong>
+            </div>
+
+            <div class="kpi-box" style="grid-column: span 2;">
+                <span>CANTIDAD TOTAL STOCK</span>
+                <strong>
+                    {{ "{:,.2f}".format(item.total_cantidad).replace(",", "X").replace(".", ",").replace("X", ".") }}
+                </strong>
+            </div>
+        </div>
+
+        <div class="empresa-actions">
+            <a href="/obras?empresa_id={{ item.empresa.id }}" class="btn btn-small btn-dark">
+                Ver Bodegas
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

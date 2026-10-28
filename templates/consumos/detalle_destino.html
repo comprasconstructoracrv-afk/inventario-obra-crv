@@ -32,7 +32,7 @@
             <th>Fecha</th>
             <th>Producto</th>
             <th>Código</th>
-            <th>Bodega</th>
+            <th>Sede/ Bodega</th>
             <th>Cantidad</th>
             <th>Unidad</th>
             <th>Observaciones</th>
@@ -43,7 +43,7 @@
             <td>{{ m.fecha.strftime("%d/%m/%Y") }}</td>
             <td>{{ m.producto.nombre }}</td>
             <td>{{ m.producto.codigo }}</td>
-            <td>{{ m.obra.nombre }}</td>
+            <td>{{ m.obra.nombre }} - {{ m.obra.ubicacion }}</td>
             <td>
                 {{ "{:,.2f}".format(m.cantidad).replace(",", "X").replace(".", ",").replace("X", ".") }}
             </td>

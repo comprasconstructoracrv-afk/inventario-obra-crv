@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, make_response
+from flask import Blueprint, render_template, request, make_response, session
 from flask_login import login_required
 from models.producto import Producto
 from models.movimiento import Movimiento
@@ -13,18 +13,27 @@ kardex_bp = Blueprint("kardex", __name__)
 @kardex_bp.route("/historial-producto", methods=["GET"])
 @login_required
 def kardex():
-    productos = Producto.query.order_by(Producto.nombre.asc()).all()
+    empresa_id = session.get("empresa_id")
+
+    if empresa_id:
+        productos = Producto.query.filter_by(empresa_id=empresa_id).order_by(Producto.nombre.asc()).all()
+    else:
+        productos = Producto.query.order_by(Producto.nombre.asc()).all()
 
     producto_id = request.args.get("producto_id")
     movimientos = []
     producto_seleccionado = None
 
     if producto_id:
-        producto_seleccionado = Producto.query.get(int(producto_id))
+        if empresa_id:
+            producto_seleccionado = Producto.query.filter_by(id=int(producto_id), empresa_id=empresa_id).first()
+        else:
+            producto_seleccionado = Producto.query.get(int(producto_id))
 
-        movimientos = Movimiento.query.filter_by(
-            producto_id=int(producto_id)
-        ).order_by(Movimiento.fecha.desc()).all()
+        if producto_seleccionado:
+            movimientos = Movimiento.query.filter_by(
+                producto_id=producto_seleccionado.id
+            ).order_by(Movimiento.fecha.desc()).all()
 
     return render_template(
         "kardex/index.html",
@@ -33,13 +42,20 @@ def kardex():
         producto_seleccionado=producto_seleccionado
     )
 
+
 @kardex_bp.route("/historial-producto/pdf/<int:producto_id>")
 @login_required
 def historial_producto_pdf(producto_id):
-    producto = Producto.query.get_or_404(producto_id)
+    empresa_id = session.get("empresa_id")
+    empresa_nombre = session.get("empresa_nombre", "SISTEMA DE INVENTARIO")
+
+    if empresa_id:
+        producto = Producto.query.filter_by(id=producto_id, empresa_id=empresa_id).first_or_404()
+    else:
+        producto = Producto.query.get_or_404(producto_id)
 
     movimientos = Movimiento.query.filter_by(
-        producto_id=producto_id
+        producto_id=producto.id
     ).order_by(Movimiento.fecha.asc()).all()
 
     buffer = BytesIO()
@@ -48,9 +64,9 @@ def historial_producto_pdf(producto_id):
     width, height = letter
     y = height - 50
 
-    # ENCABEZADO
+
     pdf.setFont("Helvetica-Bold", 18)
-    pdf.drawCentredString(width / 2, y, "INVENTARIO DE OBRA CRV")
+    pdf.drawCentredString(width / 2, y, empresa_nombre.upper())
     y -= 22
 
     pdf.setFont("Helvetica", 10)
@@ -144,7 +160,7 @@ def historial_producto_pdf(producto_id):
 
     # PIE
     pdf.setFont("Helvetica", 8)
-    pdf.drawCentredString(width / 2, 35, "Documento generado por Inventario de Obra CRV")
+    pdf.drawCentredString(width / 2, 35, f"Documento generado por {empresa_nombre}")
 
     pdf.save()
     buffer.seek(0)

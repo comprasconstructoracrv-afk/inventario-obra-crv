@@ -17,6 +17,12 @@ class Movimiento(db.Model):
 
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
 
+    responsable= db.Column(db.String(120), nullable=True)
+
     producto = db.relationship("Producto")
     obra = db.relationship("Obra")
     destino = db.relationship("Destino")
+
+    empresa_id = db.Column(db.Integer, db.ForeignKey("empresa.id"), nullable=True)
+    
+    empresa = db.relationship("Empresa", backref="movimientos", lazy=True)

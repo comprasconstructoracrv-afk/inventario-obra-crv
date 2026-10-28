@@ -140,7 +140,7 @@
 
     <div>
         <h1>Traslado Interno</h1>
-        <p>Movimiento de material entre bodegas del inventario.</p>
+        <p>Movimiento de productos entre sedes/ bodegas del inventario.</p>
     </div>
 </div>
 
@@ -167,7 +167,7 @@
         <div class="form-grid">
 
             <div class="form-group">
-                <label>Bodega origen</label>
+                <label>Sede/ Bodega origen</label>
 
                 <select name="bodega_origen_id" id="bodega_origen_id" required>
                     <option value="">Seleccione producto primero</option>
@@ -178,10 +178,10 @@
                 <label>Bodega destino</label>
 
                 <select name="bodega_destino_id" id="bodega_destino_id" required>
-                    <option value="">Seleccione bodega destino</option>
+                    <option value="">Seleccione sede/ bodega destino</option>
 
                     {% for b in bodegas %}
-                        <option value="{{ b.id }}">{{ b.nombre }}</option>
+                        <option value="{{ b.id }}">{{ b.nombre }}- {{ b.ubicacion }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -206,12 +206,23 @@
             <input
                 type="text"
                 name="observacion"
-                placeholder="Ej: reorganización interna, cambio de ubicación, traslado a bodega auxiliar"
+                placeholder="Ej: reorganización interna, cambio de ubicación, traslado a sede/ bodega auxiliar"
+            >
+        </div>
+
+        <div class="form-group">
+            <label>Responsable</label>
+
+            <input
+                type="text"
+                name="responsable"
+                placeholder="Nombre completo del responsable"
+                required
             >
         </div>
 
         <div class="alerta-info">
-            🔄 Este movimiento descuenta de la bodega origen y suma automáticamente a la bodega destino.
+            🔄 Este movimiento descuenta de la sede/ bodega origen y suma automáticamente a la sede/ bodega destino.
         </div>
 
         <div class="acciones-formulario">
@@ -238,6 +249,7 @@ const existencias = [
         producto_id: {{ e.producto_id }},
         bodega_id: {{ e.obra_id }},
         bodega_nombre: {{ e.obra.nombre|tojson }},
+        bodega_ubicacion: {{ e.obra.ubicacion|tojson }},
         cantidad: {{ e.cantidad }}
     },
     {% endif %}
@@ -247,6 +259,7 @@ const existencias = [
 document.addEventListener("DOMContentLoaded", function() {
     const productoSelect = document.getElementById("producto_id");
     const origenSelect = document.getElementById("bodega_origen_id");
+    
 
     productoSelect.addEventListener("change", function() {
         const productoId = parseInt(this.value);
@@ -255,14 +268,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const opcionInicial = document.createElement("option");
         opcionInicial.value = "";
-        opcionInicial.textContent = "Seleccione bodega origen";
+        opcionInicial.textContent = "Seleccione sede/ bodega origen";
         origenSelect.appendChild(opcionInicial);
 
         existencias.forEach(function(item) {
             if (item.producto_id === productoId && item.cantidad > 0) {
                 const option = document.createElement("option");
                 option.value = item.bodega_id;
-                option.textContent = item.bodega_nombre + " (Disponible: " + item.cantidad + ")";
+                option.textContent = item.bodega_nombre + " - " + item.bodega_ubicacion + " (Disponible: " + item.cantidad + ")";
                 origenSelect.appendChild(option);
             }
         });

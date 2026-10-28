@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+/* Estilos para el Modal de Usuarios */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 22px;
+    padding: 30px;
+    width: 100%;
+    max-width: 550px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 12px;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 20px;
+    color: #2563eb;
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #64748b;
+}
+
+.form-group-modal {
+    margin-bottom: 16px;
+}
+
+.form-group-modal label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: #0f172a;
+}
+
+.form-group-modal input,
+.form-group-modal select {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    box-sizing: border-box;
+}
+</style>
+
+<div class="header-actions no-print">
+    <div class="left-actions">
+        {% if current_user.rol == 'ADMIN' %}
+            <a href="/dashboard_principal" class="btn btn-dark">Volver</a>
+        {% endif %}
+    </div>
+
+    <div class="right-actions">
+        <button onclick="abrirModalCrear()" class="btn btn-new">+ Crear Usuario</button>
+    </div>
+</div>
+
+<div class="page-header-card">
+    <h1>Gestión de Usuarios</h1>
+    <p>Administración general de subusuarios, almacenistas y control de accesos.</p>
+</div>
+
+<!-- TABLA UNIFICADA DE USUARIOS -->
+<div class="table-card">
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Usuario</th>
+                <th>Rol</th>
+                <th>Empresa Asignada</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in usuarios %}
+            <tr>
+                <td><strong>{{ u.nombre }}</strong></td>
+                <td>{{ u.usuario }}</td>
+                <td>
+                    <span class="badge {% if u.rol == 'ADMIN' %}badge-success{% else %}badge-warning{% endif %}">
+                        {{ u.rol }}
+                    </span>
+                </td>
+                <td>
+                    {% if u.rol == 'ADMIN' %}
+                        <em>Todas las empresas (Acceso Global)</em>
+                    {% else %}
+                        {{ u.empresa.nombre if u.empresa else 'Sin Empresa Asignada' }}
+                    {% endif %}
+                </td>
+                <td>
+                    <!-- Botón para Editar en Modal -->
+                    <button type="button" 
+                            class="btn-editar" 
+                            onclick='abrirModalEditar({{ u.id }}, "{{ u.nombre }}", "{{ u.usuario }}", "{{ u.rol }}", "{{ u.empresa_id or "" }}")'
+                            style="background: #2563eb; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer;">
+                        Editar
+                    </button>
+
+                    {% if u.id != current_user.id %}
+                    <a href="{{ url_for('usuarios.eliminar_usuario', id=u.id) }}" 
+                       class="btn-eliminar" 
+                       onclick="return confirm('¿Seguro que desea eliminar este usuario?')" 
+                       style="background: #dc2626; color: white; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px;">
+                        Eliminar
+                    </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- MODAL UNIFICADO (CREAR Y EDITAR) -->
+<div class="modal-overlay" id="modalUsuario">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitulo">Crear Nuevo Usuario</h2>
+            <button class="close-modal" onclick="cerrarModal()">&times;</button>
+        </div>
+
+        <form method="POST">
+            <input type="hidden" name="action" id="modalAction" value="crear">
+            <input type="hidden" name="user_id" id="modalUserId" value="">
+
+            <div class="form-group-modal">
+                <label>Nombre Completo</label>
+                <input type="text" name="nombre" id="inputNombre" placeholder="Ej: Juan Pérez" required>
+            </div>
+
+            <div class="form-group-modal">
+                <label>Usuario (Username)</label>
+                <input type="text" name="usuario" id="inputUsuario" placeholder="Ej: almacen_ecobike" required>
+            </div>
+
+            <div class="form-group-modal">
+                <label id="labelPassword">Contraseña</label>
+                <input type="password" name="password" id="inputPassword">
+            </div>
+
+            <div class="form-group-modal">
+                <label>Rol</label>
+                <select name="rol" id="selectRol" required>
+                    <option value="ALMACENISTA">Almacenista (Asignado a 1 sola empresa)</option>
+                    <option value="ADMIN">Administrador (Acceso Total)</option>
+                </select>
+            </div>
+
+            <div class="form-group-modal" id="grupoEmpresa">
+                <label>Empresa Asignada</label>
+                <select name="empresa_id" id="selectEmpresa">
+                    <option value="">Seleccione una empresa</option>
+                    {% for e in empresas %}
+                        <option value="{{ e.id }}">{{ e.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 20px;">
+                <button type="submit" class="btn-guardar" style="background: #16a34a; color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; flex: 1;">
+                    💾 Guardar
+                </button>
+                <button type="button" onclick="cerrarModal()" style="background: #0f172a; color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer;">
+                    Cancelar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const modal = document.getElementById("modalUsuario");
+    const selectRol = document.getElementById("selectRol");
+    const grupoEmpresa = document.getElementById("grupoEmpresa");
+
+    selectRol.addEventListener("change", function () {
+        grupoEmpresa.style.display = (this.value === "ADMIN") ? "none" : "block";
+    });
+
+    function abrirModalCrear() {
+        document.getElementById("modalTitulo").textContent = "Crear Nuevo Usuario";
+        document.getElementById("modalAction").value = "crear";
+        document.getElementById("modalUserId").value = "";
+        
+        document.getElementById("inputNombre").value = "";
+        document.getElementById("inputUsuario").value = "";
+        document.getElementById("inputUsuario").disabled = false;
+        
+        document.getElementById("inputPassword").value = "";
+        document.getElementById("inputPassword").required = true;
+        document.getElementById("labelPassword").textContent = "Contraseña";
+
+        selectRol.value = "ALMACENISTA";
+        document.getElementById("selectEmpresa").value = "";
+        grupoEmpresa.style.display = "block";
+
+        modal.style.display = "flex";
+    }
+
+    function abrirModalEditar(id, nombre, usuario, rol, empresaId) {
+        document.getElementById("modalTitulo").textContent = "Editar Usuario: " + nombre;
+        document.getElementById("modalAction").value = "editar";
+        document.getElementById("modalUserId").value = id;
+
+        document.getElementById("inputNombre").value = nombre;
+        document.getElementById("inputUsuario").value = usuario;
+        document.getElementById("inputUsuario").disabled = true;
+
+        document.getElementById("inputPassword").value = "";
+        document.getElementById("inputPassword").required = false;
+        document.getElementById("labelPassword").textContent = "Cambiar Contraseña (Opcional)";
+
+        selectRol.value = rol;
+        document.getElementById("selectEmpresa").value = empresaId;
+        grupoEmpresa.style.display = (rol === "ADMIN") ? "none" : "block";
+
+        modal.style.display = "flex";
+    }
+
+    function cerrarModal() {
+        modal.style.display = "none";
+    }
+</script>
+
+{% endblock %}

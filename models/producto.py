@@ -12,3 +12,8 @@ class Producto(db.Model):
     stock_minimo = db.Column(db.Float, default=0)
     precio = db.Column(db.Float, default=0)
     activo = db.Column(db.Boolean, default=True)
+    tipo_producto= db.Column(db.String(50), default="OBRA") 
+
+    empresa_id = db.Column(db.Integer, db.ForeignKey("empresa.id"), nullable=True)
+
+    empresa = db.relationship("Empresa", backref="productos", lazy=True)

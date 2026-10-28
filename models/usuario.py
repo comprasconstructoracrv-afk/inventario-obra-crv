@@ -10,6 +10,8 @@ class Usuario(db.Model, UserMixin):
     usuario = db.Column(db.String(50), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
     rol = db.Column(db.String(50), default="ADMIN")
+    empresa_id = db.Column(db.Integer, db.ForeignKey("empresa.id"), nullable=False)
+    empresa = db.relationship("Empresa", backref="usuarios", lazy=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

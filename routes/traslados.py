@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, session
 from flask_login import login_required
 from models.producto import Producto
 from models.obra import Obra
@@ -30,9 +30,25 @@ def obtener_existencia(producto_id, obra_id):
 @traslados_bp.route("/traslados/nuevo", methods=["GET", "POST"])
 @login_required
 def nuevo_traslado():
-    productos = Producto.query.order_by(Producto.nombre.asc()).all()
-    bodegas = Obra.query.order_by(Obra.nombre.asc()).all()
-    existencias = Existencia.query.all()
+    empresa_id = session.get("empresa_id")
+
+    # 🔍 Consultar únicamente productos, bodegas y existencias pertenecientes a la empresa activa
+    if empresa_id:
+        productos = Producto.query.filter_by(empresa_id=empresa_id).order_by(Producto.nombre.asc()).all()
+        bodegas = Obra.query.filter_by(empresa_id=empresa_id).order_by(Obra.nombre.asc()).all()
+        
+        bodega_ids = [b.id for b in bodegas]
+        if bodega_ids:
+            existencias = Existencia.query.filter(
+                Existencia.obra_id.in_(bodega_ids),
+                Existencia.cantidad > 0
+            ).all()
+        else:
+            existencias = []
+    else:
+        productos = Producto.query.order_by(Producto.nombre.asc()).all()
+        bodegas = Obra.query.order_by(Obra.nombre.asc()).all()
+        existencias = Existencia.query.filter(Existencia.cantidad > 0).all()
 
     if request.method == "POST":
         producto_id = int(request.form["producto_id"])
@@ -40,6 +56,7 @@ def nuevo_traslado():
         bodega_destino_id = int(request.form["bodega_destino_id"])
         cantidad = float(request.form["cantidad"])
         observacion = request.form.get("observacion", "")
+        responsable = request.form.get("responsable", "").upper()
 
         if bodega_origen_id == bodega_destino_id:
             return "Error: La bodega origen y destino no pueden ser iguales."
@@ -58,6 +75,7 @@ def nuevo_traslado():
             obra_id=bodega_origen_id,
             tipo="SALIDA",
             cantidad=cantidad,
+            responsable=responsable,
             observaciones=f"TRASLADO A BODEGA DESTINO. {observacion}"
         )
 
@@ -66,6 +84,7 @@ def nuevo_traslado():
             obra_id=bodega_destino_id,
             tipo="INGRESO",
             cantidad=cantidad,
+            responsable=responsable,
             observaciones=f"TRASLADO DESDE BODEGA ORIGEN. {observacion}"
         )
 

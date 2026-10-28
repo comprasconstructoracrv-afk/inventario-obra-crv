@@ -148,7 +148,6 @@
     .header-actions{
         margin-bottom:18px;
     }
-
 </style>
 
 <div class="page-card">
@@ -160,9 +159,9 @@
         </div>
 
         <div>
-            <h1>Nueva Bodega</h1>
+            <h1>Nueva Sede/Bodega</h1>
             <p>
-                Registro de bodegas físicas,
+                Registro de sedes/bodegas físicas,
                 ferretería o puntos de almacenamiento.
             </p>
         </div>
@@ -182,7 +181,7 @@
 
             <div class="mini-card">
                 <span>Tipo</span>
-                <strong>BODEGA</strong>
+                <strong id="badge_tipo">BODEGA</strong>
             </div>
 
             <div class="mini-card">
@@ -197,21 +196,22 @@
 
             <h3>Datos de la bodega</h3>
 
+            <!-- CAMPO AGREGADO: TIPO DE REGISTRO (BODEGA O SEDE) -->
             <div class="form-group">
-                <label>Nombre de bodega</label>
-
-                <input type="text"
-                       name="nombre"
-                       placeholder="Ej: BODEGA 1, FERRETERÍA"
-                       required>
+                <label>Tipo de Registro</label>
+                <select name="tipo" id="select_tipo" required>
+                    <option value="BODEGA" selected>BODEGA</option>
+                    <option value="SEDE">SEDE</option>
+                </select>
             </div>
 
             <div class="form-group">
-                <label>Número de bodega</label>
+                <label>Nombre de sede/ odega</label>
 
                 <input type="text"
-                       name="numero_bodega"
-                       placeholder="Ej: 1, 2, 3, FERRETERÍA">
+                       name="nombre"
+                       placeholder="Ej: BODEGA 1, SEDE 1, FERRETERÍA"
+                       required>
             </div>
 
             <div class="form-group">
@@ -219,11 +219,11 @@
 
                 <input type="text"
                        name="ubicacion"
-                       placeholder="Ej: EDEN LUXURY, ZONA SOCIAL">
+                       placeholder="Ej: EDEN LUXURY, ZONA SOCIAL, IBAGUE, BOGOTA, ...">
             </div>
 
             <div class="form-group">
-                <label>Responsable de la bodega</label>
+                <label>Responsable de la sede/ bodega</label>
 
                 <input type="text"
                        name="responsable"
@@ -231,7 +231,7 @@
             </div>
 
             <div class="form-group">
-                <label>Estado de la bodega</label>
+                <label>Estado de la sede/ bodega</label>
 
                 <select name="estado">
 
@@ -247,14 +247,14 @@
             </div>
 
             <div class="alerta-info">
-                La bodega quedará disponible
+                La sede/ bodega quedará disponible
                 inmediatamente en el sistema.
             </div>
 
             <div class="acciones-formulario">
 
                 <button type="submit" class="btn-guardar">
-                    Guardar Bodega
+                    Guardar
                 </button>
 
                 <a href="{{ url_for('obras.listar_obras') }}" class="btn-cancelar">
@@ -268,4 +268,15 @@
     </div>
 
 </form>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const selectTipo = document.getElementById("select_tipo");
+    const badgeTipo = document.getElementById("badge_tipo");
+
+    selectTipo.addEventListener("change", function() {
+        badgeTipo.textContent = selectTipo.value;
+    });
+});
+</script>
 {% endblock %}

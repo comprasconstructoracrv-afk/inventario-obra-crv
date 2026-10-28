@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>OBRASTOCK</title>
+    <title>Inventario CRV</title>
 
     <style>
         body {
@@ -18,6 +18,10 @@
             color: white;
             position: fixed;
             padding: 20px;
+            top: 0;
+            left: 0;
+            overflow-y: auto;
+            z-index: 100;
         }
 
         .sidebar h2 {
@@ -47,17 +51,18 @@
             background: #1f2937;
         }
 
+        /* Estilo para las páginas internas con menú lateral */
         .content {
             margin-left: 300px;
             padding: 30px;
         }
 
-        .topbar {
-            background: white;
-            padding: 15px 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        /* Estilo para pantalla completa limpia en Dashboard Principal */
+        .content-full {
+            margin-left: 0 !important;
+            padding: 40px !important;
+            max-width: 1300px;
+            margin: 0 auto !important;
         }
 
         .topbar{
@@ -101,6 +106,9 @@
             padding:10px 18px;
             border-radius:12px;
             font-weight:bold;
+            display:flex;
+            align-items:center;
+            gap:10px;
         }
 
         .card, .table-card {
@@ -761,7 +769,6 @@
         }
 
         @media(max-width:1000px){
-
             .ingreso-grid{
                 grid-template-columns:1fr;
             }
@@ -769,7 +776,6 @@
             .form-grid{
                 grid-template-columns:1fr;
             }
-
         }
 
         .print-only {
@@ -790,7 +796,7 @@
                 display: block !important;
             }
 
-            .content {
+            .content, .content-full {
                 margin-left: 0 !important;
                 padding: 20px !important;
             }
@@ -824,42 +830,108 @@
                 text-align: center;
             }
         }
+
+        .modal-permiso{
+            position:fixed;
+            inset:0;
+            background:rgba(15,23,42,.55);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            z-index:9999;
+        }
+
+        .modal-permiso-card{
+            background:white;
+            width:380px;
+            padding:30px;
+            border-radius:22px;
+            text-align:center;
+            box-shadow:0 20px 50px rgba(0,0,0,.25);
+        }
+
+        .modal-icono{
+            width:70px;
+            height:70px;
+            border-radius:50%;
+            background:#fee2e2;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:34px;
+            margin:0 auto 15px;
+        }
+
+        .modal-permiso-card h2{
+            margin:0;
+            color:#0f172a;
+        }
+
+        .modal-permiso-card p{
+            color:#64748b;
+            margin:12px 0 22px;
+        }
+
+        .modal-permiso-card button{
+            background:#111827;
+            color:white;
+            border:none;
+            padding:12px 22px;
+            border-radius:12px;
+            font-weight:bold;
+            cursor:pointer;
+        }
     </style>
 </head>
 
 <body>
 
+    <!-- Ocultar barra lateral si la URL actual contiene '/dashboard_principal' -->
+    {% if 'dashboard_principal' not in request.path and '/empresas/nueva' not in request.path and '/empresas/editar' not in request.path and '/usuarios' not in request.path %}
     <div class="sidebar">
         <h2 class="menu-title">MENÚ</h2>
         <a href="/dashboard">Inicio</a>
         <a href="/existencias">Ver Inventario</a>
-        <a href="/obras">Bodegas</a>
+        <a href="/obras">Sedes/Bodegas</a>
         <a href="/productos">Productos</a>
-        <a href="/movimientos">Salidas de Material</a>
+        <a href="/movimientos">Salidas de Productos</a>
         <a href="/destinos">Destinos</a>
         <a href="/traslados/nuevo">Traslados internos</a>
         <a href="/historial-producto">Historial Producto</a>
         <a href="/consumos/destino">Consumo por Destino</a>
-        <a href="/logout">Cerrar sesión</a>
+        <a href="/reportes/inventario-bodegas">Reporte Inventario</a>
+        <a href="/dashboard_principal">Volver</a>
     </div>
+    {% endif %}
 
-    <div class="content">
+    <!-- Asignar clase full cuando estamos en dashboard_principal -->
+    <div class="{% if 'dashboard_principal' in request.path and '/empresas/nueva' not in request.path and '/empresas/editar' not in request.path %}content-full{% else %}content{% endif %}">
+
+        <!-- Ocultar topbar si la URL actual contiene '/dashboard_principal' -->
+        {% if 'dashboard_principal' not in request.path and '/empresas/nueva' not in request.path and '/empresas/editar' not in request.path %}
         <div class="topbar">
             
             <div class="topbar-left">
-                <img src="{{ url_for('static', filename='logo.png') }}">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo CRV">
                 
                 <div>
-                    <h1>INVENTARIO DE OBRA CRV</h1>
+                    <h1>
+                        {% if session.get('empresa_nombre') %}
+                            {{ session.get('empresa_nombre') }}
+                        {% else %}
+                            INVENTARIO DE OBRA CRV
+                        {% endif %}
+                    </h1>
                     <span>Sistema Profesional de Control de Inventarios</span>
                 </div>
             </div>
 
             <div class="topbar-right">
-                {{ current_user.nombre }}
+                <span>{{ current_user.nombre }}</span>
             </div>
 
         </div>
+        {% endif %}
 
         {% block content %}{% endblock %}
     </div>
@@ -892,6 +964,7 @@ function confirmarEliminar(event, mensaje) {
     return false;
 }
 </script>
+
 {% with mensajes = get_flashed_messages(with_categories=true) %}
     {% if mensajes %}
         {% for categoria, mensaje in mensajes %}
@@ -908,59 +981,6 @@ function confirmarEliminar(event, mensaje) {
         {% endfor %}
     {% endif %}
 {% endwith %}
-
-<style>
-.modal-permiso{
-    position:fixed;
-    inset:0;
-    background:rgba(15,23,42,.55);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    z-index:9999;
-}
-
-.modal-permiso-card{
-    background:white;
-    width:380px;
-    padding:30px;
-    border-radius:22px;
-    text-align:center;
-    box-shadow:0 20px 50px rgba(0,0,0,.25);
-}
-
-.modal-icono{
-    width:70px;
-    height:70px;
-    border-radius:50%;
-    background:#fee2e2;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:34px;
-    margin:0 auto 15px;
-}
-
-.modal-permiso-card h2{
-    margin:0;
-    color:#0f172a;
-}
-
-.modal-permiso-card p{
-    color:#64748b;
-    margin:12px 0 22px;
-}
-
-.modal-permiso-card button{
-    background:#111827;
-    color:white;
-    border:none;
-    padding:12px 22px;
-    border-radius:12px;
-    font-weight:bold;
-    cursor:pointer;
-}
-</style>
 
 <script>
 function cerrarModalPermiso(){

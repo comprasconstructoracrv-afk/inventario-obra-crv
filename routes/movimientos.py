@@ -1,14 +1,12 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, session
 from flask_login import login_required
 from models.movimiento import Movimiento
 from models.producto import Producto
 from models.obra import Obra
 from models.existencia import Existencia
-from extensions import db
 from models.destino import Destino
-from models.existencia import Existencia
+from extensions import db
 import json
-from flask import render_template, request, redirect, url_for
 from utils.permisos import solo_admin
 
 movimientos_bp = Blueprint("movimientos", __name__)
@@ -64,8 +62,18 @@ def aplicar_movimiento(producto_id, obra_id, tipo, cantidad):
 @login_required
 def listar_movimientos():
     buscar = request.args.get("buscar", "").strip()
+    empresa_id = session.get("empresa_id")
 
     query = Movimiento.query.filter_by(tipo="SALIDA")
+
+    # 🔍 Filtrar por las bodegas pertenecientes a la empresa en sesión
+    if empresa_id:
+        bodegas_empresa = Obra.query.filter_by(empresa_id=empresa_id).all()
+        bodega_ids = [b.id for b in bodegas_empresa]
+        if bodega_ids:
+            query = query.filter(Movimiento.obra_id.in_(bodega_ids))
+        else:
+            return render_template("movimientos/lista.html", movimientos=[])
 
     if buscar:
         query = (
@@ -94,42 +102,45 @@ def listar_movimientos():
 @movimientos_bp.route("/movimientos/nuevo", methods=["GET", "POST"])
 @login_required
 def nuevo_movimiento():
+    empresa_id = session.get("empresa_id")
 
-    productos = Producto.query.order_by(
-        Producto.nombre.asc()
-    ).all()
+    if empresa_id:
+        productos = Producto.query.filter_by(empresa_id=empresa_id).order_by(Producto.nombre.asc()).all()
+        bodegas = Obra.query.filter_by(empresa_id=empresa_id).order_by(Obra.nombre.asc()).all()
+        
+        if hasattr(Destino, "empresa_id"):
+            destinos = Destino.query.filter_by(empresa_id=empresa_id, activo=True).order_by(Destino.nombre.asc()).all()
+        else:
+            destinos = Destino.query.filter_by(activo=True).order_by(Destino.nombre.asc()).all()
 
-    bodegas = Obra.query.order_by(
-        Obra.nombre.asc()
-    ).all()
-
-    destinos = Destino.query.filter_by(
-        activo=True
-    ).order_by(
-        Destino.nombre.asc()
-    ).all()
-
-    existencias = Existencia.query.filter(
-        Existencia.cantidad > 0
-    ).all()
+        bodega_ids = [b.id for b in bodegas]
+        existencias = Existencia.query.filter(
+            Existencia.obra_id.in_(bodega_ids), 
+            Existencia.cantidad > 0
+        ).all() if bodega_ids else []
+    else:
+        productos = Producto.query.order_by(Producto.nombre.asc()).all()
+        bodegas = Obra.query.order_by(Obra.nombre.asc()).all()
+        destinos = Destino.query.filter_by(activo=True).order_by(Destino.nombre.asc()).all()
+        existencias = Existencia.query.filter(Existencia.cantidad > 0).all()
 
     existencias_json = {}
-
     for e in existencias:
-        existencias_json[str(e.producto_id)] = e.obra_id
+        pid = str(e.producto_id)
+        if pid not in existencias_json:
+            existencias_json[pid] = []
+        existencias_json[pid].append({
+            "obra_id": e.obra_id,
+            "cantidad": float(e.cantidad)
+        })
 
     if request.method == "POST":
-
         producto_id = int(request.form["producto_id"])
         obra_id = int(request.form["obra_id"])
         destino_id = int(request.form["destino_id"])
-
         cantidad = float(request.form["cantidad"])
-
-        observaciones = request.form.get(
-            "observaciones",
-            ""
-        ).upper()
+        observaciones = request.form.get("observaciones", "").upper()
+        responsable = request.form.get("responsable", "").upper()
 
         ok, mensaje = aplicar_movimiento(
             producto_id,
@@ -147,7 +158,8 @@ def nuevo_movimiento():
             tipo="SALIDA",
             cantidad=cantidad,
             destino_id=destino_id,
-            observaciones=observaciones
+            observaciones=observaciones,
+            responsable=responsable
         )
 
         db.session.add(movimiento)
@@ -162,17 +174,45 @@ def nuevo_movimiento():
         productos=productos,
         bodegas=bodegas,
         destinos=destinos,
-        existencias=existencias,
         existencias_json=json.dumps(existencias_json)
     )
 
 @movimientos_bp.route("/movimientos/editar/<int:id>", methods=["GET", "POST"])
 @login_required
-@solo_admin
 def editar_movimiento(id):
     movimiento = Movimiento.query.get_or_404(id)
-    productos = Producto.query.order_by(Producto.nombre.asc()).all()
-    bodegas = Obra.query.order_by(Obra.nombre.asc()).all()
+    empresa_id = session.get("empresa_id")
+
+    if empresa_id:
+        productos = Producto.query.filter_by(empresa_id=empresa_id).order_by(Producto.nombre.asc()).all()
+        bodegas = Obra.query.filter_by(empresa_id=empresa_id).order_by(Obra.nombre.asc()).all()
+        destinos = Destino.query.filter_by(empresa_id=empresa_id, activo=True).order_by(Destino.nombre.asc()).all() if hasattr(Destino, "empresa_id") else Destino.query.filter_by(activo=True).order_by(Destino.nombre.asc()).all()
+        
+        bodega_ids = [b.id for b in bodegas]
+        existencias = Existencia.query.filter(
+            Existencia.obra_id.in_(bodega_ids),
+            Existencia.cantidad >= 0
+        ).all() if bodega_ids else []
+    else:
+        productos = Producto.query.order_by(Producto.nombre.asc()).all()
+        bodegas = Obra.query.order_by(Obra.nombre.asc()).all()
+        destinos = Destino.query.filter_by(activo=True).order_by(Destino.nombre.asc()).all()
+        existencias = Existencia.query.filter(Existencia.cantidad >= 0).all()
+
+    existencias_json = {}
+    for e in existencias:
+        pid = str(e.producto_id)
+        if pid not in existencias_json:
+            existencias_json[pid] = []
+        
+        disponible_ajustado = float(e.cantidad)
+        if e.producto_id == movimiento.producto_id and e.obra_id == movimiento.obra_id:
+            disponible_ajustado += float(movimiento.cantidad)
+
+        existencias_json[pid].append({
+            "obra_id": e.obra_id,
+            "cantidad": disponible_ajustado
+        })
 
     if request.method == "POST":
         revertir_movimiento(movimiento)
@@ -181,8 +221,10 @@ def editar_movimiento(id):
         obra_id = int(request.form["obra_id"])
         tipo = request.form["tipo"]
         cantidad = float(request.form["cantidad"])
-        destino = request.form.get("destino", "").upper()
+        destino_id = request.form.get("destino_id")
         observaciones = request.form.get("observaciones", "").upper()
+        responsable = request.form.get("responsable", "").upper()
+
 
         ok, mensaje = aplicar_movimiento(producto_id, obra_id, tipo, cantidad)
 
@@ -194,8 +236,9 @@ def editar_movimiento(id):
         movimiento.obra_id = obra_id
         movimiento.tipo = tipo
         movimiento.cantidad = cantidad
-        movimiento.destino = destino
+        movimiento.destino_id = int(destino_id) if destino_id else None
         movimiento.observaciones = observaciones
+        movimiento.responsable = responsable
 
         db.session.commit()
 
@@ -205,7 +248,9 @@ def editar_movimiento(id):
         "movimientos/editar.html",
         movimiento=movimiento,
         productos=productos,
-        bodegas=bodegas
+        bodegas=bodegas,
+        destinos=destinos,
+        existencias_json=json.dumps(existencias_json)
     )
 
 
@@ -222,6 +267,20 @@ def eliminar_movimiento(id):
 
     return redirect(url_for("movimientos.listar_movimientos"))
 
+
+@movimientos_bp.route("/movimientos/ver-recibo/<int:id>")
+@login_required
+def ver_recibo_dinamico(id):
+    movimiento = Movimiento.query.get_or_404(id)
+    
+    # Si el movimiento tiene asignado un ID de grupo/salida múltiple
+    if hasattr(movimiento, "salida_grupal_id") and movimiento.salida_grupal_id:
+        return redirect(url_for("movimientos.recibo_salida_multiple", id=movimiento.salida_grupal_id))
+    
+    # Si es una salida individual convencional
+    return redirect(url_for("movimientos.recibo_salida", id=movimiento.id))
+
+
 @movimientos_bp.route("/movimientos/recibo-salida/<int:id>")
 @login_required
 def recibo_salida(id):
@@ -232,22 +291,12 @@ def recibo_salida(id):
         movimiento=movimiento
     )
 
-@movimientos_bp.route(
-    "/movimientos/recibo-salida-multiple"
-)
+
+@movimientos_bp.route("/movimientos/recibo-salida-multiple")
 @login_required
 def recibo_salida_multiple():
-
-    ids = request.args.get(
-        "ids",
-        ""
-    )
-
-    lista_ids = [
-        int(x)
-        for x in ids.split(",")
-        if x
-    ]
+    ids = request.args.get("ids", "")
+    lista_ids = [int(x) for x in ids.split(",") if x]
 
     movimientos = Movimiento.query.filter(
         Movimiento.id.in_(lista_ids)
@@ -258,62 +307,55 @@ def recibo_salida_multiple():
         movimientos=movimientos
     )
 
-@movimientos_bp.route(
-    "/movimientos/nuevo-multiple",
-    methods=["GET", "POST"]
-)
+
+@movimientos_bp.route("/movimientos/nuevo-multiple", methods=["GET", "POST"])
 @login_required
 def nuevo_movimiento_multiple():
+    empresa_id = session.get("empresa_id")
 
-    productos = Producto.query.order_by(
-        Producto.nombre.asc()
-    ).all()
-
-    destinos = Destino.query.filter_by(
-        activo=True
-    ).order_by(
-        Destino.nombre.asc()
-    ).all()
+    if empresa_id:
+        productos = Producto.query.filter_by(empresa_id=empresa_id).order_by(Producto.nombre.asc()).all()
+        if hasattr(Destino, "empresa_id"):
+            destinos = Destino.query.filter_by(empresa_id=empresa_id, activo=True).order_by(Destino.nombre.asc()).all()
+        else:
+            destinos = Destino.query.filter_by(activo=True).order_by(Destino.nombre.asc()).all()
+        bodegas_empresa = Obra.query.filter_by(empresa_id=empresa_id).all()
+        bodega_ids = [b.id for b in bodegas_empresa]
+    else:
+        productos = Producto.query.order_by(Producto.nombre.asc()).all()
+        destinos = Destino.query.filter_by(activo=True).order_by(Destino.nombre.asc()).all()
+        bodega_ids = None
 
     if request.method == "POST":
+        destino_id = int(request.form["destino_id"])
+        observaciones = request.form.get("observaciones", "").upper()
+        responsable = request.form.get("responsable", "").upper()
 
-        destino_id = int(
-            request.form["destino_id"]
-        )
-
-        observaciones = request.form.get(
-            "observaciones",
-            ""
-        ).upper()
-
-        productos_ids = request.form.getlist(
-            "producto_id[]"
-        )
-
-        cantidades = request.form.getlist(
-            "cantidad[]"
-        )
+        productos_ids = request.form.getlist("producto_id[]")
+        cantidades = request.form.getlist("cantidad[]")
 
         movimientos_creados = []
 
-        for producto_id, cantidad in zip(
-            productos_ids,
-            cantidades
-        ):
-
+        for producto_id, cantidad in zip(productos_ids, cantidades):
             if not cantidad:
                 continue
 
             producto_id = int(producto_id)
             cantidad = float(cantidad)
 
-            existencia = Existencia.query.filter(
+            # Buscar la existencia restringida a la bodega de la empresa activa
+            query_existencia = Existencia.query.filter(
                 Existencia.producto_id == producto_id,
                 Existencia.cantidad > 0
-            ).first()
+            )
+
+            if bodega_ids:
+                query_existencia = query_existencia.filter(Existencia.obra_id.in_(bodega_ids))
+
+            existencia = query_existencia.first()
 
             if not existencia:
-                return f"No existe inventario para el producto ID {producto_id}"
+                return f"No existe inventario disponible en esta sede para el producto ID {producto_id}"
 
             ok, mensaje = aplicar_movimiento(
                 producto_id,
@@ -331,21 +373,16 @@ def nuevo_movimiento_multiple():
                 tipo="SALIDA",
                 cantidad=cantidad,
                 destino_id=destino_id,
-                observaciones=observaciones
+                observaciones=observaciones,
+                responsable=responsable
             )
 
             db.session.add(movimiento)
-
-            movimientos_creados.append(
-                movimiento
-            )
+            movimientos_creados.append(movimiento)
 
         db.session.commit()
 
-        ids = [
-            str(m.id)
-            for m in movimientos_creados
-        ]
+        ids = [str(m.id) for m in movimientos_creados]
 
         return redirect(
             url_for(

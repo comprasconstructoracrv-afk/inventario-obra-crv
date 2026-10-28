@@ -78,11 +78,11 @@
 
     <img src="{{ url_for('static', filename='logo.png') }}" class="inicio-logo">
 
-    <h1>Bienvenido al Inventario de Obra CRV</h1>
+    <h1>Bienvenido al Inventario de {{ empresa.nombre if empresa else session.get('empresa_nombre', "Obra CRV") }}</h1>
 
     <p>
-        Sistema profesional para controlar bodegas, productos,
-        entradas, salidas, traslados e historial de materiales.
+        Sistema profesional para controlar sedes, bodegas, productos,
+        entradas, salidas, traslados e historial de productos.
     </p>
 
     <div class="inicio-grid">
@@ -90,37 +90,37 @@
         <a href="/existencias" class="inicio-opcion">
             <div class="icono">📦</div>
             <h3>Ver Inventario</h3>
-            <span>Consultar materiales por bodega</span>
+            <span>Consultar productos por sedes/bodegas</span>
         </a>
 
         <a href="/productos" class="inicio-opcion">
-            <div class="icono">🧱</div>
+            <div class="icono">🧱🚲</div>
             <h3>Productos</h3>
-            <span>Administrar materiales registrados</span>
+            <span>Administrar materiales, bicicletas o repuestos registrados</span>
         </a>
 
         <a href="/movimientos" class="inicio-opcion">
             <div class="icono">📤</div>
-            <h3>Salidas de Material</h3>
+            <h3>Salidas de Productos</h3>
             <span>Registrar despachos hacia obra</span>
         </a>
 
         <a href="/obras" class="inicio-opcion">
-            <div class="icono">🏗️</div>
-            <h3>Bodegas</h3>
+            <div class="icono">🏢🏗️</div>
+            <h3>Sedes/Bodegas</h3>
             <span>Gestionar puntos de almacenamiento</span>
         </a>
 
         <a href="/historial-producto" class="inicio-opcion">
             <div class="icono">📚</div>
             <h3>Historial Producto</h3>
-            <span>Consultar movimientos por material</span>
+            <span>Consultar movimientos por productos,respuestos y material</span>
         </a>
 
         <a href="/consumos/destino" class="inicio-opcion">
             <div class="icono">🏠</div>
-            <h3>Consumo por Destino</h3>
-            <span>Revisar consumo por casa o zona</span>
+            <h3>Consumo por Sede/Destino</h3>
+            <span>Revisar consumo por sede,zona o destino</span>
         </a>
 
     </div>

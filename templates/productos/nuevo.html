@@ -239,109 +239,127 @@
     <div class="icono">📦</div>
     <div>
         <h1>Nuevo Producto</h1>
-            {% if error_producto %}
-            <div class="modal-error">
-                <div class="modal-error-card">
-                    <div class="modal-icon">⚠️</div>
+        {% if error_producto %}
+        <div class="modal-error">
+            <div class="modal-error-card">
+                <div class="modal-icon">⚠️</div>
 
-                    <h2>Producto ya existe</h2>
+                <h2>Producto ya existe</h2>
 
-                    <p>{{ error_producto }}</p>
+                <p>{{ error_producto }}</p>
 
-                    <div class="modal-actions">
-                        <a href="/productos" class="btn-modal-primary">
-                            Ir a productos
-                        </a>
+                <div class="modal-actions">
+                    <a href="/productos" class="btn-modal-primary">
+                        Ir a productos
+                    </a>
 
-                        <button onclick="document.querySelector('.modal-error').style.display='none'"
-                                class="btn-modal-secondary">
-                            Cerrar
-                        </button>
-                    </div>
+                    <button onclick="document.querySelector('.modal-error').style.display='none'"
+                            class="btn-modal-secondary">
+                        Cerrar
+                    </button>
                 </div>
             </div>
-            {% endif %}
+        </div>
+        {% endif %}
         <p>Registro de materiales y productos del inventario.</p>
     </div>
 </div>
 
 <form method="POST">
 
+    <div class="formulario-card">
+        <h3>Datos del producto</h3>
 
-        <div class="formulario-card">
-            <h3>Datos del producto</h3>
+        <input type="hidden" name="codigo" value="{{ codigo }}">
 
-            <input type="hidden" name="codigo" value="{{ codigo }}">
+        <div class="form-group">
+            <label>Nombre del producto</label>
+            <input type="text" name="nombre" required placeholder="Ej: CEMENTO GRIS, BICICLETA R29, CADENA SHIMANO">
+        </div>
 
+        <div class="form-grid">
+            <!-- TIPO DE PRODUCTO (OBRA, BICICLETA, REPUESTO, OTRO) -->
             <div class="form-group">
-                <label>Nombre del producto</label>
-                <input type="text" name="nombre" required>
+                <label>Tipo de Producto</label>
+                <select name="tipo_producto" id="select_tipo_producto" required>
+                    <option value="OBRA">OBRA</option>
+                    <option value="BICICLETA">BICICLETA</option>
+                    <option value="REPUESTO">REPUESTO</option>
+                    <option value="OTRO">OTRO</option>
+                </select>
+                <input
+                    type="text"
+                    id="tipo_producto_personalizado"
+                    name="tipo_producto_personalizado"
+                    placeholder="Escriba el tipo (Ej: HERRAMIENTAS)"
+                    style="display:none; margin-top:10px;">
             </div>
 
             <div class="form-group">
                 <label>Categoría</label>
                 <input type="text" name="categoria" placeholder="Ej: OBRA, FERRETERÍA, ACABADOS">
             </div>
+        </div>
 
-            <div class="form-grid">
-                <div class="form-group">
-                    <label>Unidad / Referencia</label>
-                    <select name="unidad" required>
-                        <option value="">Seleccione una unidad</option>
-                        <option value="M2">M2</option>
-                        <option value="UNIDADES">UNIDADES</option>
-                        <option value="GALON">GALON</option>
-                        <option value="CAJAS">CAJAS</option>
-                        <option value="KILOGRAMO">KILOGRAMO</option>
-                        <option value="PULGADAS">PULGADAS</option>
-                        <option value="METRO LINEAL">METRO LINEAL</option>
-                        <option value="PESO">PESO</option>
-                        <option value="GRAMO">GRAMO</option>
-                        <option value="LIBRA">LIBRA</option>
-                        <option value="OTRO">OTRO</option>
-                    </select>
-                    <input
-                        type="text"
-                        id="unidad_personalizada"
-                        name="unidad_personalizada"
-                        placeholder="Escriba la unidad (Ej: ROLLOS)"
-                        style="display:none; margin-top:10px;">
-                </div>
-
-                <div class="form-group">
-                    <label>Bodega</label>
-                    <select name="obra_id" required>
-                        <option value="">Seleccione una bodega</option>
-                        {% for bodega in bodegas %}
-                            <option value="{{ bodega.id }}">{{ bodega.nombre }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Unidad / Referencia</label>
+                <select name="unidad" required>
+                    <option value="">Seleccione una unidad</option>
+                    <option value="M2">M2</option>
+                    <option value="UNIDADES">UNIDADES</option>
+                    <option value="GALON">GALON</option>
+                    <option value="CAJAS">CAJAS</option>
+                    <option value="KILOGRAMO">KILOGRAMO</option>
+                    <option value="PULGADAS">PULGADAS</option>
+                    <option value="METRO LINEAL">METRO LINEAL</option>
+                    <option value="PESO">PESO</option>
+                    <option value="GRAMO">GRAMO</option>
+                    <option value="LIBRA">LIBRA</option>
+                    <option value="OTRO">OTRO</option>
+                </select>
+                <input
+                    type="text"
+                    id="unidad_personalizada"
+                    name="unidad_personalizada"
+                    placeholder="Escriba la unidad (Ej: ROLLOS)"
+                    style="display:none; margin-top:10px;">
             </div>
 
-            <div class="form-grid">
-                <div class="form-group">
-                    <label>Cantidad</label>
-                    <input type="number" step="0.01" name="cantidad" required>
-                </div>
-            </div>
-
-            <div class="alerta-info">
-                El producto quedará registrado automáticamente en la bodega seleccionada.
-            </div>
-
-            <div class="acciones-formulario">
-                <button type="submit" class="btn-guardar">Guardar Producto</button>
-                <a href="/productos" class="btn-cancelar">Cancelar</a>
+            <div class="form-group">
+                <label>Bodega</label>
+                <select name="obra_id" required>
+                    <option value="">Seleccione una sede/ bodega</option>
+                    {% for bodega in bodegas %}
+                        <option value="{{ bodega.id }}">{{ bodega.nombre }} - {{ bodega.ubicacion }} </option>
+                    {% endfor %}
+                </select>
             </div>
         </div>
 
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Cantidad</label>
+                <input type="number" step="0.01" name="cantidad" required placeholder="0.00">
+            </div>
+        </div>
+
+        <div class="alerta-info">
+            El producto quedará registrado automáticamente en la bodega seleccionada y clasificado por su tipo.
+        </div>
+
+        <div class="acciones-formulario">
+            <button type="submit" class="btn-guardar">Guardar Producto</button>
+            <a href="/productos" class="btn-cancelar">Cancelar</a>
+        </div>
     </div>
 
 </form>
+
 <script>
 document.addEventListener("DOMContentLoaded", function(){
 
+    // Control dinámico de la unidad
     const unidad = document.querySelector('select[name="unidad"]');
     const personalizada = document.getElementById("unidad_personalizada");
 
@@ -358,6 +376,24 @@ document.addEventListener("DOMContentLoaded", function(){
 
     unidad.addEventListener("change", controlarUnidad);
     controlarUnidad();
+
+    // Control dinámico del Tipo de Producto
+    const selectTipo = document.getElementById("select_tipo_producto");
+    const tipoPersonalizado = document.getElementById("tipo_producto_personalizado");
+
+    function controlarTipoProducto(){
+        if(selectTipo.value === "OTRO"){
+            tipoPersonalizado.style.display = "block";
+            tipoPersonalizado.required = true;
+        }else{
+            tipoPersonalizado.style.display = "none";
+            tipoPersonalizado.required = false;
+            tipoPersonalizado.value = "";
+        }
+    }
+
+    selectTipo.addEventListener("change", controlarTipoProducto);
+    controlarTipoProducto();
 });
 </script>
 {% endblock %}

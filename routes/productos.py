@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, session
 from flask_login import login_required
 from datetime import datetime
 
@@ -7,7 +7,6 @@ from models.obra import Obra
 from models.existencia import Existencia
 from models.movimiento import Movimiento
 from extensions import db
-from flask import redirect, url_for
 from utils.permisos import solo_admin
 
 productos_bp = Blueprint("productos", __name__)
@@ -38,53 +37,122 @@ def obtener_existencia(producto_id, obra_id):
     return existencia
 
 
+from sqlalchemy import func
+
 @productos_bp.route("/productos")
 @login_required
 def listar_productos():
-    buscar = request.args.get("buscar", "")
+    buscar = request.args.get("buscar", "").strip()
+    tipo_filtro = request.args.get("tipo", "TODOS").upper()
+    empresa_id = session.get("empresa_id")
 
-    productos = Producto.query
+    # 🔍 Filtrar productos base por la empresa activa
+    if empresa_id:
+        base_query = Producto.query.filter_by(empresa_id=empresa_id)
+    else:
+        base_query = Producto.query
 
+    # 1. Obtener conteo total
+    conteo_todos = base_query.count()
+
+    # 2. Consultar TODOS los tipos de productos existentes dinámicamente en la base de datos
+    # Devuelve una lista de tuplas: [('OBRA', 10), ('BICICLETA', 5), ('REPUESTO', 8), ('HERRAMIENTAS', 2)]
+    tipos_dinamicos_query = (
+        db.session.query(
+            Producto.tipo_producto, 
+            func.count(Producto.id)
+        )
+        .filter(Producto.empresa_id == empresa_id if empresa_id else True)
+        .group_by(Producto.tipo_producto)
+        .all()
+    )
+
+    # Definir iconos por defecto para los tipos más comunes
+    iconos_map = {
+        "OBRA": "🏗️",
+        "BICICLETA": "🚲",
+        "REPUESTO": "⚙️"
+    }
+
+    # Estructurar la lista de categorías para la plantilla
+    categorias_cards = []
+    for tipo_nombre, cantidad in tipos_dinamicos_query:
+        if not tipo_nombre:
+            tipo_nombre = "OBRA"
+            
+        nombre_upper = tipo_nombre.upper()
+        icono = iconos_map.get(nombre_upper, "📦") # Si es un tipo nuevo personalizado, asigna el icono 📦
+        
+        categorias_cards.append({
+            "codigo": nombre_upper,
+            "nombre": nombre_upper.capitalize(),
+            "icono": icono,
+            "cantidad": cantidad
+        })
+
+    # 3. Aplicar filtro por tipo de producto en la consulta principal
+    productos_query = base_query
+    if tipo_filtro != "TODOS":
+        productos_query = productos_query.filter(Producto.tipo_producto == tipo_filtro)
+
+    # 4. Aplicar búsqueda por nombre o código
     if buscar:
-        productos = productos.filter(
-            (Producto.nombre.contains(buscar.upper())) |
-            (Producto.codigo.contains(buscar))
+        productos_query = productos_query.filter(
+            (Producto.nombre.ilike(f"%{buscar}%")) |
+            (Producto.codigo.ilike(f"%{buscar}%"))
         )
 
-    productos = productos.order_by(Producto.nombre.asc()).all()
+    productos = productos_query.order_by(Producto.nombre.asc()).all()
 
+    # 5. Cargar información de bodegas para cada producto
     producto_bodegas = {}
-
     for p in productos:
         existencias = Existencia.query.filter_by(producto_id=p.id).all()
         bodegas = []
-
         for e in existencias:
             if e.cantidad > 0:
-                cantidad = "{:,.2f}".format(e.cantidad).replace(",", "X").replace(".", ",").replace("X", ".")
-                bodegas.append(f"{e.obra.nombre}: {cantidad} {p.unidad}")
-
+                cant_fmt = "{:,.2f}".format(e.cantidad).replace(",", "X").replace(".", ",").replace("X", ".")
+                ubicacion = e.obra.ubicacion if e.obra.ubicacion else "Sin ubicación"
+                bodegas.append(f"{e.obra.nombre}- {ubicacion}: {cant_fmt} {p.unidad}")
         producto_bodegas[p.id] = bodegas
 
     return render_template(
         "productos/lista.html",
         productos=productos,
-        producto_bodegas=producto_bodegas
+        producto_bodegas=producto_bodegas,
+        tipo_filtro=tipo_filtro,
+        buscar=buscar,
+        conteo_todos=conteo_todos,
+        categorias_cards=categorias_cards
     )
 
 
 @productos_bp.route("/productos/nuevo", methods=["GET", "POST"])
 @login_required
 def nuevo_producto():
-    bodegas = Obra.query.order_by(Obra.nombre.asc()).all()
+    empresa_id = session.get("empresa_id")
+
+    # Filtrar bodegas solo de la empresa seleccionada
+    if empresa_id:
+        bodegas = Obra.query.filter_by(empresa_id=empresa_id).order_by(Obra.nombre.asc()).all()
+    else:
+        bodegas = Obra.query.order_by(Obra.nombre.asc()).all()
+
     codigo = generar_codigo_producto()
 
     if request.method == "POST":
         nombre = request.form["nombre"].upper()
 
-        producto_existente = Producto.query.filter(
-            Producto.nombre.ilike(nombre)
-        ).first()
+        # Validar si el producto ya existe en ESTA empresa
+        if empresa_id:
+            producto_existente = Producto.query.filter(
+                Producto.nombre.ilike(nombre),
+                Producto.empresa_id == empresa_id
+            ).first()
+        else:
+            producto_existente = Producto.query.filter(
+                Producto.nombre.ilike(nombre)
+            ).first()
 
         if producto_existente:
             return render_template(
@@ -94,9 +162,16 @@ def nuevo_producto():
                 error_producto=f"El producto {nombre} ya existe. Debe usar la opción Ingresar para aumentar inventario."
             )
 
-        codigo_existente = Producto.query.filter_by(
-            codigo=request.form["codigo"]
-        ).first()
+        # Validar si el código ya existe en ESTA empresa
+        if empresa_id:
+            codigo_existente = Producto.query.filter_by(
+                codigo=request.form["codigo"],
+                empresa_id=empresa_id
+            ).first()
+        else:
+            codigo_existente = Producto.query.filter_by(
+                codigo=request.form["codigo"]
+            ).first()
 
         if codigo_existente:
             return """
@@ -107,21 +182,29 @@ def nuevo_producto():
             """
 
         obra_id = int(request.form["obra_id"])
-        cantidad = float(request.form["cantidad"])
-
+        cantidad_input = request.form["cantidad"]
+        cantidad = float((cantidad_input),2)
         unidad = request.form["unidad"].upper()
 
         if unidad == "OTRO":
             unidad = request.form["unidad_personalizada"].upper()
 
+        # CAPTURAR TIPO DE PRODUCTO (OBRA, BICICLETA, REPUESTO U OTRO PERSONALIZADO)
+        tipo_producto = request.form.get("tipo_producto", "OBRA").upper()
+        if tipo_producto == "OTRO":
+            tipo_producto = request.form.get("tipo_producto_personalizado", "OBRA").upper()
+
+        # Guardar asignando empresa_id y tipo_producto
         producto = Producto(
             codigo=request.form["codigo"],
             nombre=nombre,
             categoria=request.form["categoria"].upper(),
+            tipo_producto=tipo_producto, # Nuevo campo guardado
             unidad=unidad,
             stock=cantidad,
             stock_minimo=0,
-            activo=True
+            activo=True,
+            empresa_id=empresa_id
         )
 
         db.session.add(producto)
@@ -149,17 +232,25 @@ def nuevo_producto():
         codigo=codigo
     )
 
+
 @productos_bp.route("/productos/ingresar/<int:id>", methods=["GET", "POST"])
 @login_required
 def ingresar_producto(id):
     producto = Producto.query.get_or_404(id)
-    bodegas = Obra.query.order_by(Obra.nombre.asc()).all()
+    empresa_id = session.get("empresa_id")
+
+    # 🔍 Filtrar bodegas de la empresa activa
+    if empresa_id:
+        bodegas = Obra.query.filter_by(empresa_id=empresa_id).order_by(Obra.nombre.asc()).all()
+    else:
+        bodegas = Obra.query.order_by(Obra.nombre.asc()).all()
 
     if request.method == "POST":
         obra_id = int(request.form["obra_id"])
         cantidad = float(request.form["cantidad"])
         responsable = request.form.get("responsable", "").upper()
         observaciones = request.form.get("observaciones", "").upper()
+        responsable = request.form.get("responsable", "").upper()
 
         producto.stock += cantidad
 
@@ -171,7 +262,8 @@ def ingresar_producto(id):
             obra_id=obra_id,
             tipo="INGRESO",
             cantidad=cantidad,
-            observaciones=f"INGRESO DE PRODUCTO. RESPONSABLE: {responsable}. {observaciones}"
+            observaciones=f"INGRESO DE PRODUCTO. RESPONSABLE: {responsable}. {observaciones}",
+            responsable=responsable
         )
 
         db.session.add(movimiento)
@@ -185,6 +277,7 @@ def ingresar_producto(id):
         bodegas=bodegas
     )
 
+
 @productos_bp.route("/productos/recibo-ingreso/<int:movimiento_id>")
 @login_required
 def recibo_ingreso(movimiento_id):
@@ -197,9 +290,10 @@ def recibo_ingreso(movimiento_id):
         bodega=movimiento.obra,
         cantidad=movimiento.cantidad,
         observaciones=movimiento.observaciones,
-        fecha_ingreso=movimiento.fecha.strftime("%d/%m/%Y %H:%M"),
-        responsable=""
+        responsable=movimiento.responsable,
+        fecha_ingreso=movimiento.fecha.strftime("%d/%m/%Y %H:%M")
     )
+
 
 @productos_bp.route("/productos/editar/<int:id>", methods=["GET", "POST"])
 @login_required

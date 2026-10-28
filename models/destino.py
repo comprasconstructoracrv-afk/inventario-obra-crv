@@ -10,3 +10,7 @@ class Destino(db.Model):
     estado = db.Column(db.String(20), default="ACTIVO")
 
     activo = db.Column(db.Boolean, default=True)
+
+    empresa_id = db.Column(db.Integer, db.ForeignKey("empresa.id"), nullable=True)
+    
+    empresa = db.relationship("Empresa", backref="destinos", lazy=True)
