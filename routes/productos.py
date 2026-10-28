@@ -183,7 +183,7 @@ def nuevo_producto():
 
         obra_id = int(request.form["obra_id"])
         cantidad_input = request.form["cantidad"]
-        cantidad = float((cantidad_input),2)
+        cantidad = round(float(cantidad_input),2)
         unidad = request.form["unidad"].upper()
 
         if unidad == "OTRO":
