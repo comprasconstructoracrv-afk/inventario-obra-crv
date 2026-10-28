@@ -163,6 +163,7 @@ def crear_app():
 
         columnas_a_agregar = [
             ("movimientos", "responsable", "VARCHAR(120)"),
+            ("movimientos", "empresa_id", "INTEGER REFERENCES empresa(id)"),
             ("productos", "tipo_producto", "VARCHAR(50) DEFAULT 'OBRA'"),
             ("obras", "empresa_id", "INTEGER REFERENCES empresa(id)"),
             ("productos", "empresa_id", "INTEGER REFERENCES empresa(id)"),
@@ -222,6 +223,7 @@ def crear_app():
             db.session.execute(text(f"UPDATE productos SET empresa_id = {empresa_principal.id} WHERE empresa_id IS NULL OR empresa_id = 0;"))
             db.session.execute(text(f"UPDATE destinos SET empresa_id = {empresa_principal.id} WHERE empresa_id IS NULL OR empresa_id = 0;"))
             db.session.execute(text(f"UPDATE usuarios SET empresa_id = {empresa_principal.id} WHERE empresa_id IS NULL OR empresa_id = 0;"))
+            db.session.execute(text(f"UPDATE movimientos SET empresa_id = {empresa_principal.id} WHERE empresa_id IS NULL OR empresa_id = 0;"))
             db.session.execute(text("UPDATE productos SET tipo_producto = 'OBRA' WHERE tipo_producto IS NULL;"))
             db.session.commit()
         except Exception:
